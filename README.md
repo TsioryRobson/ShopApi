@@ -18,27 +18,6 @@ Le projet utilise **Poetry** pour la gestion des dépendances et de l’environn
 
 ---
 
-# Structure du projet
-shopapi/
-│
-├── app/
-│ ├── main.py
-│ ├── core/
-│ ├── models/
-│ ├── routers/
-│ ├── services/
-│ └── repositories/
-│
-├── tests/
-├── docs/
-│
-├── pyproject.toml
-├── poetry.lock
-└── README.md
-
-
----
-
 # Installation et run du procjet
 
 ```bash 
