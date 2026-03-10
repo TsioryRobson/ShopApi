@@ -16,7 +16,9 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "shopapi", from = "src"}]
+# Ce projet est une APPLICATION (pas un package à distribuer)
+# package-mode = false → Poetry ne cherche pas de dossier "shopapi" à installer
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
