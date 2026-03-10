@@ -1,25 +1,41 @@
 """
-Point d'entrée de l'application FastAPI — ShopAPI.
+Point d'entree de l'application FastAPI — ShopAPI.
 
-On importe et on branche chaque router ici.
-Chaque router gère ses propres préfixes et endpoints.
+Au demarrage, tente de creer les tables dans Postgres.
+Si la DB n'est pas dispo (Docker pas lance), l'API demarre quand meme.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.routers import categories
 
-# Création de l'application avec métadonnées pour Swagger
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Au demarrage : connecte la DB et cree les tables."""
+    try:
+        from app.core.database import engine
+        from app.models.tables import Base
+        Base.metadata.create_all(bind=engine)
+        print("[OK] Base de donnees connectee, tables creees.")
+    except Exception as e:
+        print(f"[WARN] Impossible de se connecter a la DB: {e}")
+        print("[INFO] Lancez Docker : docker compose --env-file .env up -d")
+        print("[INFO] L'API demarre sans DB — le health check fonctionne.")
+    yield
+
+
 app = FastAPI(
     title="ShopAPI",
     description="API REST de gestion d'inventaire e-commerce",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
-# Branchement des routers
 app.include_router(categories.router)
 
 
 @app.get("/", tags=["Health"])
 def root():
-    """Health check — vérifie que l'API tourne."""
+    """Health check — verifie que l'API tourne."""
     return {"message": "Test shop API running"}
