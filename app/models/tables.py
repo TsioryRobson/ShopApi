@@ -33,11 +33,11 @@ class ProductDB(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(200), nullable=False)
-    description = Column(String(500), nullable=True)
     price = Column(Float, nullable=False)
-    stock = Column(Integer, nullable=False, default=0)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    status = Column(Integer, default=10)  # 10 = actif, 1 = supprimé (soft delete)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    modified_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relation inverse → un produit appartient à une catégorie
     category = relationship("CategoryDB", back_populates="products")
