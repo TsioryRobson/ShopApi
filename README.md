@@ -124,6 +124,18 @@ git commit -m "feat: ajout colonne prix_promo"
 git push
 ```
 
+## CORS (acces navigateur)
+
+Pour autoriser le frontend (Vite), configure `CORS_ORIGINS` dans `.env`.
+
+Exemple:
+```bash
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Pour plusieurs interfaces, ajoute les URLs separees par des virgules.
+```
+
 ### ⚠️ Règles importantes
 
 1. **NE JAMAIS modifier un fichier de migration déjà pushé** — créer une nouvelle migration à la place

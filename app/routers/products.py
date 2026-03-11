@@ -1,5 +1,5 @@
-from app.models.product import ProductCreate, ProductUpdate
-from fastapi import APIRouter, Depends, HTTPException
+from app.models.product import ProductCreate, ProductUpdate, ProductOut
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -8,21 +8,34 @@ from app.services.product_service import ProductService
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-@router.get("/")
+@router.get("/", response_model=list[ProductOut])
 def list_products(db: Session = Depends(get_db)):
     """
     Retrieve all available products.
-
-    Args:
-        db: SQLAlchemy database session provided by dependency injection.
-
-    Returns:
-        list: A list of active products.
     """
     return ProductService.list_products(db)
 
+@router.get("/filter", response_model=list[ProductOut])
+def filter_products(
+    category_id: int = None,
+    min_price: float = None,
+    max_price: float = None,
+    name: str = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Filter products by category, price range, and name.
+    """
+    return ProductService.filter_products(
+        db,
+        category_id=category_id,
+        min_price=min_price,
+        max_price=max_price,
+        name=name
+    )
 
-@router.post("/")
+
+@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     """
     Create a new product.
@@ -60,7 +73,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
     return {"message": "Product deleted"}
 
 
-@router.put("/{product_id}")
+@router.put("/{product_id}", response_model=ProductOut)
 def update_product(
     product_id: int, product: ProductUpdate, db: Session = Depends(get_db)
 ):
