@@ -18,14 +18,27 @@ class ProductService:
     def list_products(db: Session) -> list[ProductDB]:
         """
         Retrieve all available products.
-
-        Args:
-            db: SQLAlchemy database session.
-
-        Returns:
-            list[Product]: List of active products.
         """
         return ProductRepository.get_all(db)
+
+    @staticmethod
+    def filter_products(
+        db: Session,
+        category_id: int = None,
+        min_price: float = None,
+        max_price: float = None,
+        name: str = None
+    ) -> list[ProductDB]:
+        """
+        Filter products by category, price range, and name.
+        """
+        return ProductRepository.filter_products(
+            db,
+            category_id=category_id,
+            min_price=min_price,
+            max_price=max_price,
+            name=name
+        )
 
     @staticmethod
     def create_product(db: Session, data: ProductCreate) -> ProductDB:

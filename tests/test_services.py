@@ -223,3 +223,47 @@ class TestProductService:
         """Test que supprimer un produit inexistant retourne None."""
         result = ProductService.delete_product(db_session, 999)
         assert result is None
+
+    # ------------------------------------------------------------------
+    # Tests for new filter functionality
+    # ------------------------------------------------------------------
+    def test_filter_products_by_category(self, db_session, category):
+        """Filtering should return only products of given category."""
+        # create another category
+        from app.services import category_service
+        other = category_service.create_category(db_session, CategoryCreate(name="Other"))
+        # create products in both categories
+        ProductService.create_product(db_session, ProductCreate(name="A", price=5.0, category_id=category.id))
+        ProductService.create_product(db_session, ProductCreate(name="B", price=7.0, category_id=other.id))
+
+        results = ProductService.filter_products(db_session, category_id=category.id)
+        assert len(results) == 1
+        assert results[0].category_id == category.id
+
+    def test_filter_products_by_price_range(self, db_session, category):
+        """Filtering should respect min_price/max_price bounds."""
+        ProductService.create_product(db_session, ProductCreate(name="Cheap", price=10.0, category_id=category.id))
+        ProductService.create_product(db_session, ProductCreate(name="Mid", price=50.0, category_id=category.id))
+        ProductService.create_product(db_session, ProductCreate(name="Expensive", price=100.0, category_id=category.id))
+
+        res = ProductService.filter_products(db_session, min_price=20, max_price=80)
+        prices = [p.price for p in res]
+        assert prices == [50.0]
+
+    def test_filter_products_by_name(self, db_session, category):
+        """Filtering by partial name should perform case‑insensitive match."""
+        ProductService.create_product(db_session, ProductCreate(name="FirstItem", price=1, category_id=category.id))
+        ProductService.create_product(db_session, ProductCreate(name="Second", price=2, category_id=category.id))
+
+        res = ProductService.filter_products(db_session, name="first")
+        assert len(res) == 1
+        assert "FirstItem" in res[0].name
+
+    def test_filter_products_combined(self, db_session, category):
+        """Combining filters should narrow results accordingly."""
+        ProductService.create_product(db_session, ProductCreate(name="Combo", price=30.0, category_id=category.id))
+        ProductService.create_product(db_session, ProductCreate(name="Combo", price=70.0, category_id=category.id))
+
+        res = ProductService.filter_products(db_session, min_price=20, max_price=50, name="combo")
+        assert len(res) == 1
+        assert res[0].price == 30.0
