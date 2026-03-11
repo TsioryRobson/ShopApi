@@ -26,7 +26,7 @@ def get_user(db: Session, user_id: int) -> UserOut:
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Utilisateur avec l'id {user_id} introuvable"
+            detail=f"Utilisateur avec l'id {user_id} introuvable",
         )
     return UserOut.model_validate(user)
 
@@ -39,12 +39,12 @@ def create_user(db: Session, data: UserCreate) -> UserOut:
     if user_repo.get_by_username(db, data.username) is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Le username '{data.username}' est déjà utilisé"
+            detail=f"Le username '{data.username}' est déjà utilisé",
         )
     if user_repo.get_by_email(db, data.email) is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"L'email '{data.email}' est déjà utilisé"
+            detail=f"L'email '{data.email}' est déjà utilisé",
         )
 
     hashed = hash_password(data.password)
@@ -62,7 +62,7 @@ def update_user(db: Session, user_id: int, data: UserUpdate) -> UserOut:
     if existing is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Utilisateur avec l'id {user_id} introuvable"
+            detail=f"Utilisateur avec l'id {user_id} introuvable",
         )
 
     # Vérifie les conflits uniquement si les champs changent
@@ -70,14 +70,14 @@ def update_user(db: Session, user_id: int, data: UserUpdate) -> UserOut:
         if user_repo.get_by_username(db, data.username) is not None:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Le username '{data.username}' est déjà utilisé"
+                detail=f"Le username '{data.username}' est déjà utilisé",
             )
 
     if data.email is not None and data.email != existing.email:
         if user_repo.get_by_email(db, data.email) is not None:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"L'email '{data.email}' est déjà utilisé"
+                detail=f"L'email '{data.email}' est déjà utilisé",
             )
 
     # Prépare les données à mettre à jour
@@ -97,7 +97,7 @@ def delete_user(db: Session, user_id: int) -> dict:
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Utilisateur avec l'id {user_id} introuvable"
+            detail=f"Utilisateur avec l'id {user_id} introuvable",
         )
     return {"message": f"Utilisateur {user_id} supprimé avec succès"}
 

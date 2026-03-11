@@ -1,0 +1,27 @@
+tests/conftest.py:22:1: E402 module level import not at top of file
+tests/conftest.py:23:1: E402 module level import not at top of file
+tests/conftest.py:24:1: E402 module level import not at top of file
+tests/test_database.py:10:1: F401 'pytest' imported but unused
+tests/test_database.py:11:1: F401 'sqlalchemy.create_engine' imported but unused
+tests/test_database.py:13:1: F401 'sqlalchemy.pool.StaticPool' imported but unused
+tests/test_lifespan.py:5:1: F401 'pytest' imported but unused
+tests/test_lifespan.py:6:1: F401 'unittest.mock.patch' imported but unused
+tests/test_lifespan.py:6:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/test_lifespan.py:7:1: F401 'fastapi.FastAPI' imported but unused
+tests/test_main.py:10:1: F401 'pytest' imported but unused
+tests/test_main.py:11:1: F401 'unittest.mock.patch' imported but unused
+tests/test_main.py:11:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/test_main.py:12:1: F401 'fastapi.testclient.TestClient' imported but unused
+tests/test_product_repo.py:11:1: F401 'unittest.mock.MagicMock' imported but unused
+tests/test_product_repo.py:12:1: F401 'sqlalchemy.exc.SQLAlchemyError' imported but unused
+tests/test_routers.py:343:27: F541 f-string is missing placeholders
+tests/test_routers.py:348:28: F541 f-string is missing placeholders
+tests/test_routers.py:354:28: F541 f-string is missing placeholders
+tests/test_security.py:9:1: F401 'pytest' imported but unused
+tests/test_security.py:17:89: E501 line too long (97 > 88 characters)
+tests/test_services.py:15:1: F401 'app.models.tables.ProductDB' imported but unused
+tests/test_user_repo.py:135:9: F841 local variable 'found_lower' is assigned to but never used
+tests/test_user_repo.py:140:9: F841 local variable 'user' is assigned to but never used
+tests/test_user_service.py:119:9: F841 local variable 'updated' is assigned to but never used
+tests/test_user_service.py:141:9: F841 local variable 'user1' is assigned to but never used
+tests/test_user_service_advanced.py:131:9: F841 local variable 'user1' is assigned to but never used

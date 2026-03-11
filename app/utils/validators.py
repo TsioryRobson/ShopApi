@@ -1,9 +1,11 @@
 from app.core.exceptions import InvalidProductPriceException
 
+
 class ProductValidator:
     """
     Provide validation utilities for product-related data.
     """
+
     @staticmethod
     def validate_price(price: float):
         """

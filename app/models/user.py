@@ -13,18 +13,19 @@ from typing import Optional
 
 class UserBase(BaseModel):
     """Champs communs à toutes les opérations sur un utilisateur."""
+
     username: str = Field(
         ...,
         min_length=1,
         max_length=50,
         description="Nom d'utilisateur unique",
-        examples=["johndoe"]
+        examples=["johndoe"],
     )
     email: str = Field(
         ...,
         max_length=100,
         description="Adresse email unique",
-        examples=["john@example.com"]
+        examples=["john@example.com"],
     )
 
 
@@ -33,10 +34,9 @@ class UserCreate(UserBase):
     Schéma pour CRÉER un utilisateur.
     Hérite de UserBase + champ password obligatoire.
     """
+
     password: str = Field(
-        ...,
-        min_length=6,
-        description="Mot de passe (minimum 6 caractères)"
+        ..., min_length=6, description="Mot de passe (minimum 6 caractères)"
     )
 
 
@@ -45,21 +45,18 @@ class UserUpdate(BaseModel):
     Schéma pour MODIFIER un utilisateur.
     Tous les champs sont optionnels → mise à jour partielle.
     """
+
     username: Optional[str] = Field(
         default=None,
         min_length=1,
         max_length=50,
-        description="Nouveau nom d'utilisateur"
+        description="Nouveau nom d'utilisateur",
     )
     email: Optional[str] = Field(
-        default=None,
-        max_length=100,
-        description="Nouvelle adresse email"
+        default=None, max_length=100, description="Nouvelle adresse email"
     )
     password: Optional[str] = Field(
-        default=None,
-        min_length=6,
-        description="Nouveau mot de passe"
+        default=None, min_length=6, description="Nouveau mot de passe"
     )
 
 
@@ -68,6 +65,7 @@ class UserOut(BaseModel):
     Schéma de SORTIE → ce que l'API renvoie.
     Le mot de passe haché n'est JAMAIS exposé.
     """
+
     id: int = Field(..., description="Identifiant unique de l'utilisateur")
     username: str = Field(..., description="Nom d'utilisateur")
     email: str = Field(..., description="Adresse email")
