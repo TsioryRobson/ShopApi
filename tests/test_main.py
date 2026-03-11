@@ -7,9 +7,6 @@ Teste :
 - La configuration CORS
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
 from app.main import app
 
 
@@ -47,7 +44,7 @@ def test_api_docs_available(client):
     """Test que la documentation API est disponible."""
     response = client.get("/docs")
     assert response.status_code == 200
-    
+
 
 def test_openapi_schema(client):
     """Test que le schéma OpenAPI est disponible."""

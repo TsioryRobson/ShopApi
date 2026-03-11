@@ -28,8 +28,8 @@ class TestUsersRouter:
             json={
                 "username": "testuser",
                 "email": "test@example.com",
-                "password": "securepass123"
-            }
+                "password": "securepass123",
+            },
         )
         assert response.status_code == status.HTTP_201_CREATED
         data = response.json()
@@ -45,16 +45,16 @@ class TestUsersRouter:
             json={
                 "username": "duplicate",
                 "email": "email1@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         response = client.post(
             "/users/",
             json={
                 "username": "duplicate",
                 "email": "email2@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         assert response.status_code == status.HTTP_409_CONFLICT
 
@@ -65,16 +65,16 @@ class TestUsersRouter:
             json={
                 "username": "user1",
                 "email": "duplicate@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         response = client.post(
             "/users/",
             json={
                 "username": "user2",
                 "email": "duplicate@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         assert response.status_code == status.HTTP_409_CONFLICT
 
@@ -86,8 +86,8 @@ class TestUsersRouter:
             json={
                 "username": "alice",
                 "email": "alice@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         user_id = create_response.json()["id"]
 
@@ -111,8 +111,8 @@ class TestUsersRouter:
                 json={
                     "username": f"user{i}",
                     "email": f"user{i}@example.com",
-                    "password": "pass123"
-                }
+                    "password": "pass123",
+                },
             )
 
         response = client.get("/users/")
@@ -123,17 +123,12 @@ class TestUsersRouter:
         """PUT /users/{id} — mettre à jour un utilisateur."""
         create_response = client.post(
             "/users/",
-            json={
-                "username": "bob",
-                "email": "bob@example.com",
-                "password": "pass123"
-            }
+            json={"username": "bob", "email": "bob@example.com", "password": "pass123"},
         )
         user_id = create_response.json()["id"]
 
         response = client.put(
-            f"/users/{user_id}",
-            json={"email": "bob.new@example.com"}
+            f"/users/{user_id}", json={"email": "bob.new@example.com"}
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -142,10 +137,7 @@ class TestUsersRouter:
 
     def test_update_user_not_found(self, client):
         """PUT /users/{id} — 404 si user inexistant."""
-        response = client.put(
-            "/users/999",
-            json={"email": "test@example.com"}
-        )
+        response = client.put("/users/999", json={"email": "test@example.com"})
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_user(self, client):
@@ -155,8 +147,8 @@ class TestUsersRouter:
             json={
                 "username": "todelete",
                 "email": "delete@example.com",
-                "password": "pass123"
-            }
+                "password": "pass123",
+            },
         )
         user_id = create_response.json()["id"]
 
@@ -187,7 +179,7 @@ class TestCategoriesRouter:
         """POST /categories/ — créer une catégorie."""
         response = client.post(
             "/categories/",
-            json={"name": "Electronics", "description": "Electric devices"}
+            json={"name": "Electronics", "description": "Electric devices"},
         )
         assert response.status_code == status.HTTP_201_CREATED
         data = response.json()
@@ -196,10 +188,7 @@ class TestCategoriesRouter:
 
     def test_get_category_by_id(self, client):
         """GET /categories/{id} — récupérer une catégorie."""
-        create_response = client.post(
-            "/categories/",
-            json={"name": "Books"}
-        )
+        create_response = client.post("/categories/", json={"name": "Books"})
         category_id = create_response.json()["id"]
 
         response = client.get(f"/categories/{category_id}")
@@ -213,25 +202,16 @@ class TestCategoriesRouter:
 
     def test_update_category(self, client):
         """PUT /categories/{id} — mettre à jour une catégorie."""
-        create_response = client.post(
-            "/categories/",
-            json={"name": "OldName"}
-        )
+        create_response = client.post("/categories/", json={"name": "OldName"})
         category_id = create_response.json()["id"]
 
-        response = client.put(
-            f"/categories/{category_id}",
-            json={"name": "NewName"}
-        )
+        response = client.put(f"/categories/{category_id}", json={"name": "NewName"})
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["name"] == "NewName"
 
     def test_delete_category(self, client):
         """DELETE /categories/{id} — supprimer une catégorie."""
-        create_response = client.post(
-            "/categories/",
-            json={"name": "ToDelete"}
-        )
+        create_response = client.post("/categories/", json={"name": "ToDelete"})
         category_id = create_response.json()["id"]
 
         response = client.delete(f"/categories/{category_id}")
@@ -248,10 +228,7 @@ class TestProductsRouter:
     @pytest.fixture
     def category_id(self, client):
         """Crée une catégorie et retourne son ID pour les tests."""
-        response = client.post(
-            "/categories/",
-            json={"name": "TestCategory"}
-        )
+        response = client.post("/categories/", json={"name": "TestCategory"})
         return response.json()["id"]
 
     def test_list_products_empty(self, client):
@@ -264,7 +241,7 @@ class TestProductsRouter:
         """POST /products/ — créer un produit."""
         response = client.post(
             "/products/",
-            json={"name": "Laptop", "price": 999.99, "category_id": category_id}
+            json={"name": "Laptop", "price": 999.99, "category_id": category_id},
         )
         assert response.status_code == status.HTTP_201_CREATED
         data = response.json()
@@ -276,16 +253,18 @@ class TestProductsRouter:
         """POST /products/ — erreur si prix = 0."""
         response = client.post(
             "/products/",
-            json={"name": "InvalidProduct", "price": 0, "category_id": category_id}
+            json={"name": "InvalidProduct", "price": 0, "category_id": category_id},
         )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY or \
-               response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert (
+            response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+            or response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
     def test_create_product_invalid_price_negative(self, client, category_id):
         """POST /products/ — erreur si prix < 0."""
         response = client.post(
             "/products/",
-            json={"name": "InvalidProduct", "price": -50, "category_id": category_id}
+            json={"name": "InvalidProduct", "price": -50, "category_id": category_id},
         )
         # Pydantic rejette le prix négatif (gt=0)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -294,30 +273,24 @@ class TestProductsRouter:
         """PUT /products/{id} — mettre à jour un produit."""
         create_response = client.post(
             "/products/",
-            json={"name": "Phone", "price": 500.0, "category_id": category_id}
+            json={"name": "Phone", "price": 500.0, "category_id": category_id},
         )
         product_id = create_response.json()["id"]
 
-        response = client.put(
-            f"/products/{product_id}",
-            json={"price": 450.0}
-        )
+        response = client.put(f"/products/{product_id}", json={"price": 450.0})
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["price"] == 450.0
 
     def test_update_product_not_found(self, client):
         """PUT /products/{id} — 404 si produit inexistant."""
-        response = client.put(
-            "/products/999",
-            json={"name": "Test"}
-        )
+        response = client.put("/products/999", json={"name": "Test"})
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_product_soft_delete(self, client, category_id):
         """DELETE /products/{id} — soft delete (produit toujours en DB)."""
         create_response = client.post(
             "/products/",
-            json={"name": "ToDelete", "price": 50.0, "category_id": category_id}
+            json={"name": "ToDelete", "price": 50.0, "category_id": category_id},
         )
         product_id = create_response.json()["id"]
 
@@ -342,8 +315,8 @@ class TestProductsRouter:
                 json={
                     "name": f"Product {i}",
                     "price": float(i + 1) * 10,
-                    "category_id": category_id
-                }
+                    "category_id": category_id,
+                },
             )
 
         response = client.get("/products/")
@@ -353,23 +326,32 @@ class TestProductsRouter:
     def test_filter_products_router(self, client, category_id):
         """GET /products/filter avec différents paramètres."""
         # create a few products
-        client.post("/products/", json={"name": "Apple", "price": 5.0, "category_id": category_id})
-        client.post("/products/", json={"name": "Banana", "price": 15.0, "category_id": category_id})
-        client.post("/products/", json={"name": "Cherry", "price": 25.0, "category_id": category_id})
+        client.post(
+            "/products/",
+            json={"name": "Apple", "price": 5.0, "category_id": category_id},
+        )
+        client.post(
+            "/products/",
+            json={"name": "Banana", "price": 15.0, "category_id": category_id},
+        )
+        client.post(
+            "/products/",
+            json={"name": "Cherry", "price": 25.0, "category_id": category_id},
+        )
 
         # filter by min_price only
-        resp = client.get(f"/products/filter?min_price=10")
+        resp = client.get("/products/filter?min_price=10")
         assert resp.status_code == status.HTTP_200_OK
         assert all(p["price"] >= 10 for p in resp.json())
 
         # filter by name substring
-        resp2 = client.get(f"/products/filter?name=app")
+        resp2 = client.get("/products/filter?name=app")
         assert resp2.status_code == status.HTTP_200_OK
         assert len(resp2.json()) == 1
         assert resp2.json()[0]["name"] == "Apple"
 
         # filter by range and name
-        resp3 = client.get(f"/products/filter?min_price=10&max_price=30&name=an")
+        resp3 = client.get("/products/filter?min_price=10&max_price=30&name=an")
         assert resp3.status_code == status.HTTP_200_OK
         assert len(resp3.json()) == 1
         assert resp3.json()[0]["name"] == "Banana"

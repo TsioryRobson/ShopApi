@@ -6,7 +6,6 @@ Couvre :
 - verify_password() — vérification du mot de passe
 """
 
-import pytest
 from app.core.security import hash_password, verify_password
 
 
@@ -14,7 +13,7 @@ class TestSecurityFunctions:
     """Tests des fonctions de sécurité."""
 
     def test_hash_password_creates_different_hashes(self):
-        """Test que le même mot de passe génère des hashes différents (cause: salt aléatoire)."""
+        """Test que le même MDP donne des hashes différents (cause: salt)."""
         password = "securepass123"
         hash1 = hash_password(password)
         hash2 = hash_password(password)

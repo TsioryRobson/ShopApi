@@ -1,0 +1,38 @@
+app\repositories\product_repo.py:24: error: Incompatible default for argument "category_id" (default has type "None", argument has type "int")  [assignment]
+app\repositories\product_repo.py:24: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\repositories\product_repo.py:24: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\repositories\product_repo.py:25: error: Incompatible default for argument "min_price" (default has type "None", argument has type "float")  [assignment]
+app\repositories\product_repo.py:25: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\repositories\product_repo.py:25: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\repositories\product_repo.py:26: error: Incompatible default for argument "max_price" (default has type "None", argument has type "float")  [assignment]
+app\repositories\product_repo.py:26: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\repositories\product_repo.py:26: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\repositories\product_repo.py:27: error: Incompatible default for argument "name" (default has type "None", argument has type "str")  [assignment]
+app\repositories\product_repo.py:27: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\repositories\product_repo.py:27: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\repositories\product_repo.py:101: error: Incompatible types in assignment (expression has type "int", variable has type "Column[int]")  [assignment]
+app\services\product_service.py:27: error: Incompatible default for argument "category_id" (default has type "None", argument has type "int")  [assignment]
+app\services\product_service.py:27: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\services\product_service.py:27: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\services\product_service.py:28: error: Incompatible default for argument "min_price" (default has type "None", argument has type "float")  [assignment]
+app\services\product_service.py:28: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\services\product_service.py:28: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\services\product_service.py:29: error: Incompatible default for argument "max_price" (default has type "None", argument has type "float")  [assignment]
+app\services\product_service.py:29: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\services\product_service.py:29: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\services\product_service.py:30: error: Incompatible default for argument "name" (default has type "None", argument has type "str")  [assignment]
+app\services\product_service.py:30: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\services\product_service.py:30: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\routers\products.py:21: error: Incompatible default for argument "category_id" (default has type "None", argument has type "int")  [assignment]
+app\routers\products.py:21: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\routers\products.py:21: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\routers\products.py:22: error: Incompatible default for argument "min_price" (default has type "None", argument has type "float")  [assignment]
+app\routers\products.py:22: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\routers\products.py:22: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\routers\products.py:23: error: Incompatible default for argument "max_price" (default has type "None", argument has type "float")  [assignment]
+app\routers\products.py:23: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\routers\products.py:23: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+app\routers\products.py:24: error: Incompatible default for argument "name" (default has type "None", argument has type "str")  [assignment]
+app\routers\products.py:24: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+app\routers\products.py:24: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+Found 13 errors in 3 files (checked 27 source files)
