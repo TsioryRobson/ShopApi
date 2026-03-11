@@ -1,29 +1,34 @@
 """
 Point d'entree de l'application FastAPI — ShopAPI.
 
-Au demarrage, tente de creer les tables dans Postgres.
-Si la DB n'est pas dispo (Docker pas lance), l'API demarre quand meme.
+Au demarrage, verifie la connexion DB.
+Les tables sont gerees par Alembic (migrations versionnees).
+Commande : poetry run alembic upgrade head
 """
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from app.core.config import settings
 from app.routers import categories, products, users
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Au demarrage : connecte la DB et cree les tables."""
+    """Au demarrage : verifie la connexion a la DB."""
     try:
         from app.core.database import engine
-        from app.models.tables import Base
-        Base.metadata.create_all(bind=engine)
-        print("[OK] Base de donnees connectee, tables creees.")
+
+        # Simple test de connexion — les tables sont gerees par Alembic
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        print("[OK] Base de donnees connectee.")
+        print("[INFO] Tables gerees par Alembic → 'poetry run alembic upgrade head'")
     except Exception as e:
         print(f"[WARN] Impossible de se connecter a la DB: {e}")
-        print("[INFO] Lancez Docker : docker compose --env-file .env up -d")
-        print("[INFO] L'API demarre sans DB — le health check fonctionne.")
+        print("[INFO] Lancez Docker : docker compose --env-file .env up postgres -d")
+        print("[INFO] Puis appliquez les migrations : poetry run alembic upgrade head")
     yield
 
 
