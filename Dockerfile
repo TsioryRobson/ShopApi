@@ -5,24 +5,13 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Installer poetry
-RUN pip install --no-cache-dir poetry
+RUN pip install --no-cache-dir poetry six
 
 # Dossier de travail
 WORKDIR /app
 
 # Copier uniquement les fichiers de dépendances
 COPY pyproject.toml poetry.lock* /app/
-
-# Installer dépendances système nécessaires à la compilation de certaines roues
-# (ex: bcrypt via cffi). Ces paquets permettent à pip/build d'installer proprement
-# les extensions binaires lorsque des roues précompilées n'existent pas.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       build-essential \
-       libffi-dev \
-       libssl-dev \
-       python3-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Configurer poetry pour installer dans l'environnement global du container
 RUN poetry config virtualenvs.create false \

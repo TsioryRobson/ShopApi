@@ -1,78 +1,68 @@
+# app/core/security.py
 """
-Utilitaires de sécurité — hashage et vérification des mots de passe.
-
-Utilise hashlib (stdlib Python) avec SHA-256 + salt aléatoire.
-Format stocké en base : "<salt>:<hash>"
-
-Note : en production, préférer passlib[bcrypt] pour une résistance
-aux attaques par force brute (bcrypt est intentionnellement lent).
-Installation : poetry add "passlib[bcrypt]"
+JWT + dépendances OAuth2 pour FastAPI.
+- Création du token
+- Décodage/validation
+- Dépendance get_current_user (utilise un import paresseux pour éviter les cycles)
 """
 
-import hashlib
-import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Optional
 
-from jose import jwt
-from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.database import get_db
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def hash_password(plain_password: str) -> str:
-    """
-    Hache un mot de passe avec un salt aléatoire.
-
-    Args:
-        plain_password: Le mot de passe en clair.
-
-    Returns:
-        str: La chaîne "<salt>:<hash>" à stocker en base.
-    """
-    # Optionnel : conserver le hash legacy (salt:sha256) ou utiliser passlib to_hash
-    # Ici on laisse la méthode existante (legacy) pour compatibilité
-    salt = secrets.token_hex(16)
-    hashed = hashlib.sha256((salt + plain_password).encode()).hexdigest()
-    return f"{salt}:{hashed}"
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Supporte deux formats :
-      - legacy: "<salt>:<sha256hex>"
-      - passlib/bcrypt standard (ex: "$2b$...") -> vérifié via passlib
-    Retourne True si correspond, False sinon.
-    """
-    if not hashed_password:
-        return False
-    # legacy format detect (contains a single colon)
-    try:
-        if ":" in hashed_password:
-            salt, stored_hash = hashed_password.split(":", 1)
-            computed = hashlib.sha256((salt + plain_password).encode()).hexdigest()
-            return secrets.compare_digest(computed, stored_hash)
-        # else try passlib (bcrypt etc.)
-        return pwd_context.verify(plain_password, hashed_password)
-    except Exception:
-        return False
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    """
-    Crée un token d'accès.
-
-    Args:
-        data: Les données à encoder.
-        expires_delta: Durée d'expiration (optionnel).
-
-    Returns:
-        str: Le token d'accès.
-    """
     to_encode = data.copy()
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def decode_access_token(token: str) -> str:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        sub = payload.get("sub")
+        if sub is None:
+            raise JWTError("missing-sub")
+        return sub
+    except JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide ou expiré",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """
+    Récupère l'utilisateur courant à partir du JWT.
+    Import paresseux de user_service pour éviter l'import circulaire.
+    """
+    # ⬇️ Import **à l'intérieur** de la fonction
+    from app.services.user_service import get_user_by_email
+
+    email = decode_access_token(token)
+    user = get_user_by_email(db, email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Utilisateur introuvable",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if getattr(user, "is_active", True) is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Utilisateur inactif")
+    return user

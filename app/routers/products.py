@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services.product_service import ProductService
+from app.core.security import get_current_user
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -36,7 +37,7 @@ def filter_products(
 
 
 @router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
-def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+def create_product(product: ProductCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Create a new product.
 
@@ -51,13 +52,14 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db)):
+def delete_product(product_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Soft delete a product by its identifier.
 
     Args:
         product_id: Identifier of the product to delete.
         db: SQLAlchemy database session.
+        current_user: The currently authenticated user.
 
     Raises:
         HTTPException: If the product does not exist.
@@ -75,7 +77,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{product_id}", response_model=ProductOut)
 def update_product(
-    product_id: int, product: ProductUpdate, db: Session = Depends(get_db)
+    product_id: int, product: ProductUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)
 ):
     """
     Update an existing product.
@@ -84,6 +86,7 @@ def update_product(
         product_id: Identifier of the product to update.
         product: Updated product data.
         db: SQLAlchemy database session.
+        current_user: The currently authenticated user.
 
     Raises:
         HTTPException: If the product does not exist.

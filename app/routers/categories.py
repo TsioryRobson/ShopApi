@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.category import CategoryCreate, CategoryUpdate, CategoryOut
 from app.services import category_service
+from app.core.security import get_current_user
 
 router = APIRouter(
     prefix="/categories",
@@ -27,12 +28,12 @@ def get_category(category_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED, summary="Creer une categorie")
-def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
+def create_category(category: CategoryCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return category_service.create_category(db, category)
 
 
 @router.put("/{category_id}", response_model=CategoryOut, summary="Modifier une categorie")
-def update_category(category_id: int, category: CategoryUpdate, db: Session = Depends(get_db)):
+def update_category(category_id: int, category: CategoryUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return category_service.update_category(db, category_id, category)
 
 
