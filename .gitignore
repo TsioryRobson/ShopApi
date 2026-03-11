@@ -1,9 +1,33 @@
-\.env
+# ============================================================
+# Fichiers ignorés par Git — ShopAPI
+# ============================================================
+
+# --- Variables d'environnement (chaque dev a le sien) ---
+.env
+
+# --- Python ---
 __pycache__/
 *.pyc
-venv/
-/.venv
-venv/
-__pycache__/
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# --- Environnement virtuel ---
 .venv/
+venv/
+
+# --- Tests ---
 .pytest_cache/
+.coverage
+htmlcov/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
