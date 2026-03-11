@@ -28,7 +28,9 @@ def list_users(db: Session = Depends(get_db)):
     return user_service.get_all_users(db)
 
 
-@router.get("/{user_id}", response_model=UserOut, summary="Obtenir un utilisateur par ID")
+@router.get(
+    "/{user_id}", response_model=UserOut, summary="Obtenir un utilisateur par ID"
+)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     """Retourne un utilisateur par son identifiant. 404 si introuvable."""
     return user_service.get_user(db, user_id)
@@ -38,7 +40,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     "/",
     response_model=UserOut,
     status_code=status.HTTP_201_CREATED,
-    summary="Créer un utilisateur"
+    summary="Créer un utilisateur",
 )
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     """
@@ -62,7 +64,7 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
 @router.delete(
     "/{user_id}",
     summary="Supprimer un utilisateur",
-    responses={200: {"description": "Utilisateur supprimé avec succès"}}
+    responses={200: {"description": "Utilisateur supprimé avec succès"}},
 )
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     """

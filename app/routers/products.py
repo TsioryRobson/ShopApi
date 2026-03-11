@@ -15,23 +15,20 @@ def list_products(db: Session = Depends(get_db)):
     """
     return ProductService.list_products(db)
 
+
 @router.get("/filter", response_model=list[ProductOut])
 def filter_products(
-    category_id: int = None,
-    min_price: float = None,
-    max_price: float = None,
-    name: str = None,
-    db: Session = Depends(get_db)
+    category_id: int | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    name: str | None = None,
+    db: Session = Depends(get_db),
 ):
     """
     Filter products by category, price range, and name.
     """
     return ProductService.filter_products(
-        db,
-        category_id=category_id,
-        min_price=min_price,
-        max_price=max_price,
-        name=name
+        db, category_id=category_id, min_price=min_price, max_price=max_price, name=name
     )
 
 

@@ -32,5 +32,7 @@ class TestProductValidator:
 
     def test_validate_price_exception_message(self):
         """Test que le message d'exception est correct."""
-        with pytest.raises(InvalidProductPriceException, match="Price must be greater than 0"):
+        with pytest.raises(
+            InvalidProductPriceException, match="Price must be greater than 0"
+        ):
             ProductValidator.validate_price(-5)
