@@ -11,6 +11,14 @@ Installation : poetry add "passlib[bcrypt]"
 
 import hashlib
 import secrets
+from datetime import datetime, timedelta
+
+from jose import jwt
+from passlib.context import CryptContext
+
+from app.core.config import settings
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(plain_password: str) -> str:
@@ -23,25 +31,48 @@ def hash_password(plain_password: str) -> str:
     Returns:
         str: La chaîne "<salt>:<hash>" à stocker en base.
     """
-    salt = secrets.token_hex(16)  # 32 caractères hex aléatoires
+    # Optionnel : conserver le hash legacy (salt:sha256) ou utiliser passlib to_hash
+    # Ici on laisse la méthode existante (legacy) pour compatibilité
+    salt = secrets.token_hex(16)
     hashed = hashlib.sha256((salt + plain_password).encode()).hexdigest()
     return f"{salt}:{hashed}"
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Vérifie si un mot de passe en clair correspond au hash stocké.
+    Supporte deux formats :
+      - legacy: "<salt>:<sha256hex>"
+      - passlib/bcrypt standard (ex: "$2b$...") -> vérifié via passlib
+    Retourne True si correspond, False sinon.
+    """
+    if not hashed_password:
+        return False
+    # legacy format detect (contains a single colon)
+    try:
+        if ":" in hashed_password:
+            salt, stored_hash = hashed_password.split(":", 1)
+            computed = hashlib.sha256((salt + plain_password).encode()).hexdigest()
+            return secrets.compare_digest(computed, stored_hash)
+        # else try passlib (bcrypt etc.)
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        return False
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    """
+    Crée un token d'accès.
 
     Args:
-        plain_password: Le mot de passe soumis par l'utilisateur.
-        hashed_password: Le hash stocké en base (format "salt:hash").
+        data: Les données à encoder.
+        expires_delta: Durée d'expiration (optionnel).
 
     Returns:
-        bool: True si le mot de passe est correct, False sinon.
+        str: Le token d'accès.
     """
-    try:
-        salt, stored_hash = hashed_password.split(":")
-        computed = hashlib.sha256((salt + plain_password).encode()).hexdigest()
-        return secrets.compare_digest(computed, stored_hash)
-    except (ValueError, AttributeError):
-        return False
+    to_encode = data.copy()
+    if expires_delta is None:
+        expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
