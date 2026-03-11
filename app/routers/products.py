@@ -9,15 +9,14 @@ from app.core.security import get_current_user
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-@router.get("/", response_model=list[ProductOut])
+@router.get("/", response_model=list[ProductOut], summary="List all products")
 def list_products(db: Session = Depends(get_db)):
     """
     Retrieve all available products.
     """
     return ProductService.list_products(db)
 
-
-@router.get("/filter", response_model=list[ProductOut])
+@router.get("/filter", response_model=list[ProductOut], summary="Filter products by category, price range, and name")
 def filter_products(
     category_id: int | None = None,
     min_price: float | None = None,
@@ -32,8 +31,17 @@ def filter_products(
         db, category_id=category_id, min_price=min_price, max_price=max_price, name=name
     )
 
+@router.get("/{product_id}", response_model=ProductOut, summary="Get a product by ID")
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieve a product by its ID.
+    """
+    product = ProductService.get_product(db, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
 
-@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ProductOut, status_code=status.HTTP_201_CREATED, summary="Create a new product")
 def create_product(product: ProductCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Create a new product.
@@ -48,7 +56,7 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db), curren
     return ProductService.create_product(db, product)
 
 
-@router.delete("/{product_id}")
+@router.delete("/{product_id}", summary="Delete a product by ID")
 def delete_product(product_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Soft delete a product by its identifier.
@@ -72,7 +80,7 @@ def delete_product(product_id: int, db: Session = Depends(get_db), current_user 
     return {"message": "Product deleted"}
 
 
-@router.put("/{product_id}", response_model=ProductOut)
+@router.put("/{product_id}", response_model=ProductOut, summary="Update an existing product")
 def update_product(
     product_id: int, product: ProductUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)
 ):
