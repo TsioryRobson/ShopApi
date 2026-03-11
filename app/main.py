@@ -9,7 +9,7 @@ Commande : poetry run alembic upgrade head
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
-from app.routers import categories
+from app.routers import categories, products
 
 
 @asynccontextmanager
@@ -38,6 +38,7 @@ app = FastAPI(
 )
 
 app.include_router(categories.router)
+app.include_router(products.router)
 
 
 @app.get("/", tags=["Health"])
