@@ -14,14 +14,30 @@ class ProductRepository:
     def get_all(db: Session) -> list[ProductDB]:
         """
         Retrieve all active products.
-
-        Args:
-            db: SQLAlchemy database session.
-
-        Returns:
-            list[Product]: List of products whose status is not deleted.
         """
         return db.query(ProductDB).filter(ProductDB.status != 1).all()
+
+    @staticmethod
+    def filter_products(
+        db: Session,
+        category_id: int = None,
+        min_price: float = None,
+        max_price: float = None,
+        name: str = None
+    ) -> list[ProductDB]:
+        """
+        Filter products by category, price range, and name.
+        """
+        query = db.query(ProductDB).filter(ProductDB.status != 1)
+        if category_id is not None:
+            query = query.filter(ProductDB.category_id == category_id)
+        if min_price is not None:
+            query = query.filter(ProductDB.price >= min_price)
+        if max_price is not None:
+            query = query.filter(ProductDB.price <= max_price)
+        if name is not None:
+            query = query.filter(ProductDB.name.ilike(f"%{name}%"))
+        return query.all()
 
     @staticmethod
     def get_by_id(db: Session, product_id: int) -> ProductDB | None:

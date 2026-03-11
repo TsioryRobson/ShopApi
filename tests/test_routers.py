@@ -349,3 +349,27 @@ class TestProductsRouter:
         response = client.get("/products/")
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()) == 3
+
+    def test_filter_products_router(self, client, category_id):
+        """GET /products/filter avec différents paramètres."""
+        # create a few products
+        client.post("/products/", json={"name": "Apple", "price": 5.0, "category_id": category_id})
+        client.post("/products/", json={"name": "Banana", "price": 15.0, "category_id": category_id})
+        client.post("/products/", json={"name": "Cherry", "price": 25.0, "category_id": category_id})
+
+        # filter by min_price only
+        resp = client.get(f"/products/filter?min_price=10")
+        assert resp.status_code == status.HTTP_200_OK
+        assert all(p["price"] >= 10 for p in resp.json())
+
+        # filter by name substring
+        resp2 = client.get(f"/products/filter?name=app")
+        assert resp2.status_code == status.HTTP_200_OK
+        assert len(resp2.json()) == 1
+        assert resp2.json()[0]["name"] == "Apple"
+
+        # filter by range and name
+        resp3 = client.get(f"/products/filter?min_price=10&max_price=30&name=an")
+        assert resp3.status_code == status.HTTP_200_OK
+        assert len(resp3.json()) == 1
+        assert resp3.json()[0]["name"] == "Banana"
