@@ -40,6 +40,17 @@ poetry run uvicorn app.main:app --reload
 http://127.0.0.1:8000
 ```
 
+## CORS (acces navigateur)
+
+Pour autoriser le frontend (Vite), configure `CORS_ORIGINS` dans `.env`.
+
+Exemple:
+```bash
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Pour plusieurs interfaces, ajoute les URLs separees par des virgules.
+
 ## Swagger :
 ```bash 
 http://127.0.0.1:8000/docs

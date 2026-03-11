@@ -10,7 +10,9 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      # Dans Docker, Postgres est accessible via le nom du service "postgres" sur le port interne 5432
+      # On écrase le DATABASE_URL du .env (qui utilise localhost:5434 pour l'hôte)
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     volumes:
       - .:/app
 

@@ -7,7 +7,9 @@ Si la DB n'est pas dispo (Docker pas lance), l'API demarre quand meme.
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.routers import categories, products
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from app.routers import categories, products, users
 
 
 @asynccontextmanager
@@ -32,8 +34,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+cors_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(categories.router)
 app.include_router(products.router)
+app.include_router(users.router)
 
 
 @app.get("/", tags=["Health"])

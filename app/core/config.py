@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # Nom du projet
     PROJECT_NAME: str = "ShopAPI"
 
+    # Frontend origins autorisees pour les appels navigateur (CORS)
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
+
     class Config:
         env_file = ".env"
         extra = "ignore"  # Ignore les variables .env supplémentaires (POSTGRES_USER, etc.)
