@@ -7,6 +7,8 @@ Si la DB n'est pas dispo (Docker pas lance), l'API demarre quand meme.
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 from app.routers import categories, products, users
 
 
@@ -30,6 +32,16 @@ app = FastAPI(
     description="API REST de gestion d'inventaire e-commerce",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+cors_origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(categories.router)
