@@ -16,6 +16,7 @@ from app.core.database import Base
 
 class CategoryDB(Base):
     """Table 'categories' dans Postgres."""
+
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -29,6 +30,7 @@ class CategoryDB(Base):
 
 class ProductDB(Base):
     """Table 'products' dans Postgres (préparé pour US2 - Dania)."""
+
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -45,6 +47,7 @@ class ProductDB(Base):
 
 class UserDB(Base):
     """Table 'users' dans Postgres (préparé pour US3 - Manoa et US5 - Gaëlle)."""
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)

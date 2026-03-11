@@ -15,23 +15,11 @@ from typing import Optional
 class ProductBase(BaseModel):
     """Champs communs à toutes les opérations sur un produit."""
 
-    name: str = Field(
-        ...,
-        min_length=1,
-        max_length=255,
-        description="Nom du produit"
-    )
+    name: str = Field(..., min_length=1, max_length=255, description="Nom du produit")
 
-    category_id: int = Field(
-        ...,
-        description="Identifiant de la catégorie du produit"
-    )
+    category_id: int = Field(..., description="Identifiant de la catégorie du produit")
 
-    price: float = Field(
-        ...,
-        gt=0,
-        description="Prix du produit"
-    )
+    price: float = Field(..., gt=0, description="Prix du produit")
 
 
 class ProductCreate(ProductBase):
@@ -39,6 +27,7 @@ class ProductCreate(ProductBase):
     Schéma pour CRÉER un produit.
     Hérite de ProductBase → tous les champs sont obligatoires.
     """
+
     pass
 
 
@@ -49,21 +38,15 @@ class ProductUpdate(BaseModel):
     """
 
     name: Optional[str] = Field(
-        default=None,
-        min_length=1,
-        max_length=255,
-        description="Nouveau nom du produit"
+        default=None, min_length=1, max_length=255, description="Nouveau nom du produit"
     )
 
     category_id: Optional[int] = Field(
-        default=None,
-        description="Nouvelle catégorie du produit"
+        default=None, description="Nouvelle catégorie du produit"
     )
 
     price: Optional[float] = Field(
-        default=None,
-        gt=0,
-        description="Nouveau prix du produit"
+        default=None, gt=0, description="Nouveau prix du produit"
     )
 
 

@@ -24,10 +24,10 @@ class ProductService:
     @staticmethod
     def filter_products(
         db: Session,
-        category_id: int = None,
-        min_price: float = None,
-        max_price: float = None,
-        name: str = None
+        category_id: int | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        name: str | None = None,
     ) -> list[ProductDB]:
         """
         Filter products by category, price range, and name.
@@ -37,7 +37,7 @@ class ProductService:
             category_id=category_id,
             min_price=min_price,
             max_price=max_price,
-            name=name
+            name=name,
         )
 
     @staticmethod
@@ -91,9 +91,7 @@ class ProductService:
 
     @staticmethod
     def update_product(
-        db: Session,
-        product_id: int,
-        data: ProductUpdate
+        db: Session, product_id: int, data: ProductUpdate
     ) -> ProductDB | None:
         """
         Update an existing product.
@@ -112,7 +110,5 @@ class ProductService:
             ProductValidator.validate_price(data.price)
 
         return ProductRepository.update(
-            db,
-            product_id,
-            data.model_dump(exclude_unset=True)
+            db, product_id, data.model_dump(exclude_unset=True)
         )

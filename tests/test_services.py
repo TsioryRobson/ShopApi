@@ -12,7 +12,6 @@ from app.models.category import CategoryCreate, CategoryUpdate
 from app.models.product import ProductCreate, ProductUpdate
 from app.services import category_service
 from app.services.product_service import ProductService
-from app.models.tables import ProductDB
 
 
 class TestCategoryService:
@@ -25,10 +24,7 @@ class TestCategoryService:
 
     def test_create_category_success(self, db_session):
         """Test la création d'une catégorie valide."""
-        data = CategoryCreate(
-            name="Electronics",
-            description="Electronic devices"
-        )
+        data = CategoryCreate(name="Electronics", description="Electronic devices")
         category = category_service.create_category(db_session, data)
 
         assert category.id is not None
@@ -133,11 +129,7 @@ class TestProductService:
 
     def test_create_product_success(self, db_session, category):
         """Test la création d'un produit valide."""
-        data = ProductCreate(
-            name="Laptop",
-            price=999.99,
-            category_id=category.id
-        )
+        data = ProductCreate(name="Laptop", price=999.99, category_id=category.id)
         product = ProductService.create_product(db_session, data)
 
         assert product.id is not None
@@ -149,28 +141,24 @@ class TestProductService:
     def test_create_product_invalid_price_zero(self, db_session, category):
         """Test qu'un prix de 0 lève une exception (Pydantic)."""
         from pydantic import ValidationError
+
         with pytest.raises(ValidationError):
-            ProductCreate(
-                name="InvalidProduct",
-                price=0,
-                category_id=category.id
-            )
+            ProductCreate(name="InvalidProduct", price=0, category_id=category.id)
 
     def test_create_product_invalid_price_negative(self, db_session, category):
         """Test qu'un prix négatif lève une exception (Pydantic)."""
         from pydantic import ValidationError
+
         with pytest.raises(ValidationError):
-            ProductCreate(
-                name="InvalidProduct",
-                price=-50,
-                category_id=category.id
-            )
+            ProductCreate(name="InvalidProduct", price=-50, category_id=category.id)
 
     def test_list_products_active_only(self, db_session, category):
         """Test que list_products ne retourne que les produits actifs (status != 1)."""
         # Créer 2 produits
         for i in range(2):
-            data = ProductCreate(name=f"Product {i}", price=10.0, category_id=category.id)
+            data = ProductCreate(
+                name=f"Product {i}", price=10.0, category_id=category.id
+            )
             ProductService.create_product(db_session, data)
 
         # Tous les produits devraient être listés (status = 10 par défaut)
@@ -231,10 +219,17 @@ class TestProductService:
         """Filtering should return only products of given category."""
         # create another category
         from app.services import category_service
-        other = category_service.create_category(db_session, CategoryCreate(name="Other"))
+
+        other = category_service.create_category(
+            db_session, CategoryCreate(name="Other")
+        )
         # create products in both categories
-        ProductService.create_product(db_session, ProductCreate(name="A", price=5.0, category_id=category.id))
-        ProductService.create_product(db_session, ProductCreate(name="B", price=7.0, category_id=other.id))
+        ProductService.create_product(
+            db_session, ProductCreate(name="A", price=5.0, category_id=category.id)
+        )
+        ProductService.create_product(
+            db_session, ProductCreate(name="B", price=7.0, category_id=other.id)
+        )
 
         results = ProductService.filter_products(db_session, category_id=category.id)
         assert len(results) == 1
@@ -242,9 +237,16 @@ class TestProductService:
 
     def test_filter_products_by_price_range(self, db_session, category):
         """Filtering should respect min_price/max_price bounds."""
-        ProductService.create_product(db_session, ProductCreate(name="Cheap", price=10.0, category_id=category.id))
-        ProductService.create_product(db_session, ProductCreate(name="Mid", price=50.0, category_id=category.id))
-        ProductService.create_product(db_session, ProductCreate(name="Expensive", price=100.0, category_id=category.id))
+        ProductService.create_product(
+            db_session, ProductCreate(name="Cheap", price=10.0, category_id=category.id)
+        )
+        ProductService.create_product(
+            db_session, ProductCreate(name="Mid", price=50.0, category_id=category.id)
+        )
+        ProductService.create_product(
+            db_session,
+            ProductCreate(name="Expensive", price=100.0, category_id=category.id),
+        )
 
         res = ProductService.filter_products(db_session, min_price=20, max_price=80)
         prices = [p.price for p in res]
@@ -252,8 +254,13 @@ class TestProductService:
 
     def test_filter_products_by_name(self, db_session, category):
         """Filtering by partial name should perform case‑insensitive match."""
-        ProductService.create_product(db_session, ProductCreate(name="FirstItem", price=1, category_id=category.id))
-        ProductService.create_product(db_session, ProductCreate(name="Second", price=2, category_id=category.id))
+        ProductService.create_product(
+            db_session,
+            ProductCreate(name="FirstItem", price=1, category_id=category.id),
+        )
+        ProductService.create_product(
+            db_session, ProductCreate(name="Second", price=2, category_id=category.id)
+        )
 
         res = ProductService.filter_products(db_session, name="first")
         assert len(res) == 1
@@ -261,9 +268,15 @@ class TestProductService:
 
     def test_filter_products_combined(self, db_session, category):
         """Combining filters should narrow results accordingly."""
-        ProductService.create_product(db_session, ProductCreate(name="Combo", price=30.0, category_id=category.id))
-        ProductService.create_product(db_session, ProductCreate(name="Combo", price=70.0, category_id=category.id))
+        ProductService.create_product(
+            db_session, ProductCreate(name="Combo", price=30.0, category_id=category.id)
+        )
+        ProductService.create_product(
+            db_session, ProductCreate(name="Combo", price=70.0, category_id=category.id)
+        )
 
-        res = ProductService.filter_products(db_session, min_price=20, max_price=50, name="combo")
+        res = ProductService.filter_products(
+            db_session, min_price=20, max_price=50, name="combo"
+        )
         assert len(res) == 1
         assert res[0].price == 30.0
