@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  api:
+    build: .
+    container_name: shopapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      # Dans Docker, Postgres est accessible via le nom du service "postgres" sur le port interne 5432
+      # On écrase le DATABASE_URL du .env (qui utilise localhost:5434 pour l'hôte)
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - .:/app
+
+  postgres:
+    image: postgres:15
+    container_name: shopapi_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
