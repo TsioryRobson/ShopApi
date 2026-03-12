@@ -1,0 +1,35 @@
+site_name: ShopAPI Documentation
+site_description: Documentation technique de ShopAPI
+site_author: Equipe de développement ShopAPI
+
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["."]
+
+nav:
+  - Home: index.md
+  - Models:
+      - User: models/user.md
+      - Category: models/category.md
+      - Product: models/product.md
+      - Tables: models/tables.md
+  - Repositories:
+      - UserRepository: repositories/user_repo.md
+      - CategoryRepository: repositories/category_repo.md
+      - ProductRepository: repositories/product_repo.md
+  - Services:
+      - UserService: services/user_service.md
+      - CategoryService: services/category_service.md
+      - ProductService: services/product_service.md
+  - Routes:
+      - User Routes: routers/users.md
+      - Category Routes: routers/categories.md
+      - Product Routes: routers/products.md
+  - Utils:
+      - Validations : utils/validators.md
