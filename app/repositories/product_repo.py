@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.tables import ProductDB
 
+
 class ProductRepository:
     """
     Provide database operations for Product entities.
@@ -20,10 +21,10 @@ class ProductRepository:
     @staticmethod
     def filter_products(
         db: Session,
-        category_id: int = None,
-        min_price: float = None,
-        max_price: float = None,
-        name: str = None
+        category_id: int | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
+        name: str | None = None,
     ) -> list[ProductDB]:
         """
         Filter products by category, price range, and name.
@@ -51,10 +52,11 @@ class ProductRepository:
         Returns:
             ProductDB | None: The requested product or None if not found.
         """
-        return db.query(ProductDB).filter(
-            ProductDB.id == product_id,
-            ProductDB.status != 1
-        ).first()
+        return (
+            db.query(ProductDB)
+            .filter(ProductDB.id == product_id, ProductDB.status != 1)
+            .first()
+        )
 
     @staticmethod
     def create(db: Session, product: ProductDB) -> ProductDB:
@@ -96,7 +98,7 @@ class ProductRepository:
             return None
 
         try:
-            product.status = 1
+            product.status = 1  # type: ignore
             db.commit()
             db.refresh(product)
             return product
@@ -118,10 +120,11 @@ class ProductRepository:
             ProductDB | None: The updated product if it exists,
             otherwise None.
         """
-        product = db.query(ProductDB).filter(
-            ProductDB.id == product_id,
-            ProductDB.status != 1
-        ).first()
+        product = (
+            db.query(ProductDB)
+            .filter(ProductDB.id == product_id, ProductDB.status != 1)
+            .first()
+        )
 
         if product is None:
             return None

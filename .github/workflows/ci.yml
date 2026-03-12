@@ -1,0 +1,72 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+    
+    # Base de données pour effectuer les tests (il faut que l'API puisse se connecter)
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: shopapi_user
+          POSTGRES_PASSWORD: shopapi_pass_dev
+          POSTGRES_DB: shopapi_db
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          
+      - name: Install dependencies (Poetry)
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          # Installing all dependencies without asking
+          poetry install --no-interaction --no-root
+          
+      - name: Make .env based on example for setup
+        run: cp .env.example .env
+        
+      # -- Les différentes étapes de qualité du code --
+
+      - name: Code formatting check (Black)
+        run: poetry run black --check app/ tests/
+        continue-on-error: true # Pour ne pas bloquer immédiatement s'il y a un soucis de formattage
+        
+      - name: Linting check (Flake8)
+        run: poetry run flake8 app/ tests/
+        continue-on-error: true
+        
+      - name: Type checking (Mypy)
+        run: poetry run mypy app/
+        continue-on-error: true
+
+      - name: Run Pytest
+        env:
+          # On s'assure que la CI utilise bien le port 5434 (port mappé via GitHub actions services)
+          DATABASE_URL: postgresql://shopapi_user:shopapi_pass_dev@localhost:5434/shopapi_db
+        run: |
+          # 1. On applique les migrations DB dans la machine GHA
+          poetry run alembic upgrade head
+          
+          # 2. On lance les tests
+          poetry run pytest -v --cov=app
+

@@ -20,53 +20,41 @@ class TestUserRepositoryExceptions:
         """Test que update() gère les exceptions et rollback."""
         # D'abord créer un utilisateur
         user = UserDB(
-            username="testuser",
-            email="test@example.com",
-            hashed_password="hashed123"
+            username="testuser", email="test@example.com", hashed_password="hashed123"
         )
         db_session.add(user)
         db_session.commit()
         db_session.refresh(user)
         user_id = user.id
-        
+
         # Patch la session pour simuler une exception lors du commit
-        with patch.object(db_session, 'commit', side_effect=Exception("DB Error")):
+        with patch.object(db_session, "commit", side_effect=Exception("DB Error")):
             with pytest.raises(Exception) as exc_info:
-                user_repo.update(
-                    db_session,
-                    user_id,
-                    {"email": "newemail@example.com"}
-                )
-            
+                user_repo.update(db_session, user_id, {"email": "newemail@example.com"})
+
             assert "DB Error" in str(exc_info.value)
 
     def test_delete_with_exception(self, db_session):
         """Test que delete() gère les exceptions et rollback."""
         # D'abord créer un utilisateur
         user = UserDB(
-            username="deluser",
-            email="del@example.com",
-            hashed_password="hashed123"
+            username="deluser", email="del@example.com", hashed_password="hashed123"
         )
         db_session.add(user)
         db_session.commit()
         db_session.refresh(user)
         user_id = user.id
-        
+
         # Patch la session pour simuler une exception lors du commit
-        with patch.object(db_session, 'commit', side_effect=Exception("DB Error")):
+        with patch.object(db_session, "commit", side_effect=Exception("DB Error")):
             with pytest.raises(Exception) as exc_info:
                 user_repo.delete(db_session, user_id)
-            
+
             assert "DB Error" in str(exc_info.value)
 
     def test_update_not_found(self, db_session):
         """Test update() quand l'utilisateur n'existe pas."""
-        result = user_repo.update(
-            db_session,
-            999,
-            {"email": "newemail@example.com"}
-        )
+        result = user_repo.update(db_session, 999, {"email": "newemail@example.com"})
         assert result is None
 
     def test_delete_not_found(self, db_session):
@@ -78,25 +66,20 @@ class TestUserRepositoryExceptions:
         """Test update() avec plusieurs champs."""
         # Créer un utilisateur
         user = UserDB(
-            username="alice",
-            email="alice@example.com",
-            hashed_password="pass123"
+            username="alice", email="alice@example.com", hashed_password="pass123"
         )
         db_session.add(user)
         db_session.commit()
         db_session.refresh(user)
         user_id = user.id
-        
+
         # Mettre à jour plusieurs champs
         updated = user_repo.update(
             db_session,
             user_id,
-            {
-                "email": "alice.new@example.com",
-                "hashed_password": "newpass456"
-            }
+            {"email": "alice.new@example.com", "hashed_password": "newpass456"},
         )
-        
+
         assert updated is not None
         assert updated.email == "alice.new@example.com"
         assert updated.hashed_password == "newpass456"
@@ -106,18 +89,16 @@ class TestUserRepositoryExceptions:
         """Test la suppression réussie d'un utilisateur."""
         # Créer un utilisateur
         user = UserDB(
-            username="tobedeleted",
-            email="del@example.com",
-            hashed_password="pass123"
+            username="tobedeleted", email="del@example.com", hashed_password="pass123"
         )
         db_session.add(user)
         db_session.commit()
         user_id = user.id
-        
+
         # Supprimer
         result = user_repo.delete(db_session, user_id)
         assert result is True
-        
+
         # Vérifier qu'il n'existe plus
         deleted_user = db_session.query(UserDB).filter(UserDB.id == user_id).first()
         assert deleted_user is None
@@ -129,47 +110,39 @@ class TestUserRepositoryExceptions:
             user = UserDB(
                 username=f"user{i}",
                 email=f"user{i}@example.com",
-                hashed_password="pass123"
+                hashed_password="pass123",
             )
             db_session.add(user)
         db_session.commit()
-        
+
         all_users = user_repo.get_all(db_session)
         assert len(all_users) == 3
 
     def test_get_by_email_case_sensitive(self, db_session):
         """Test que get_by_email() est sensible à la casse."""
         user = UserDB(
-            username="testuser",
-            email="Test@Example.Com",
-            hashed_password="pass123"
+            username="testuser", email="Test@Example.Com", hashed_password="pass123"
         )
         db_session.add(user)
         db_session.commit()
-        
+
         # Chercher avec la bonne casse
         found = user_repo.get_by_email(db_session, "Test@Example.Com")
         assert found is not None
-        
+
         # Chercher avec une casse différente (SQL est généralement case-insensitive)
         # mais on teste le comportement
-        found_lower = user_repo.get_by_email(db_session, "test@example.com")
+        user_repo.get_by_email(db_session, "test@example.com")
         # Cela pourrait être None ou le même user selon la DB
 
     def test_create_user_with_special_characters(self, db_session):
         """Test la création d'utilisateur avec des caractères spéciaux."""
-        user = UserDB(
-            username="user_with-special.chars",
-            email="special+chars@example.com",
-            hashed_password="pass123"
-        )
-        
         created = user_repo.create(
             db_session,
             "user_with-special.chars",
             "special+chars@example.com",
-            "pass123"
+            "pass123",
         )
-        
+
         assert created.username == "user_with-special.chars"
         assert created.email == "special+chars@example.com"

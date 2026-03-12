@@ -20,7 +20,7 @@ def get_category(db: Session, category_id: int) -> CategoryOut:
     if category is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Categorie avec l'id {category_id} introuvable"
+            detail=f"Categorie avec l'id {category_id} introuvable",
         )
     return CategoryOut.model_validate(category, from_attributes=True)
 
@@ -37,7 +37,7 @@ def update_category(db: Session, category_id: int, data: CategoryUpdate) -> Cate
     if updated is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Categorie avec l'id {category_id} introuvable"
+            detail=f"Categorie avec l'id {category_id} introuvable",
         )
     return CategoryOut.model_validate(updated, from_attributes=True)
 
@@ -48,6 +48,6 @@ def delete_category(db: Session, category_id: int) -> dict:
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Categorie avec l'id {category_id} introuvable"
+            detail=f"Categorie avec l'id {category_id} introuvable",
         )
     return {"message": f"Categorie {category_id} supprimee avec succes"}

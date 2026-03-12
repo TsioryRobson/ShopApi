@@ -26,9 +26,7 @@ class TestUserService:
     def test_create_user_success(self, db_session):
         """Test la création d'un utilisateur valide."""
         data = UserCreate(
-            username="testuser",
-            email="test@example.com",
-            password="securepass123"
+            username="testuser", email="test@example.com", password="securepass123"
         )
         user = user_service.create_user(db_session, data)
 
@@ -36,21 +34,17 @@ class TestUserService:
         assert user.username == "testuser"
         assert user.email == "test@example.com"
         # Le mot de passe ne doit jamais être en réponse
-        assert not hasattr(user, 'password')
+        assert not hasattr(user, "password")
 
     def test_create_user_duplicate_username(self, db_session):
         """Test qu'on ne peut pas créer deux utilisateurs avec le même username."""
         data1 = UserCreate(
-            username="dupliuser",
-            email="user1@example.com",
-            password="pass123"
+            username="dupliuser", email="user1@example.com", password="pass123"
         )
         user_service.create_user(db_session, data1)
 
         data2 = UserCreate(
-            username="dupliuser",
-            email="user2@example.com",
-            password="pass123"
+            username="dupliuser", email="user2@example.com", password="pass123"
         )
         with pytest.raises(HTTPException) as exc_info:
             user_service.create_user(db_session, data2)
@@ -61,16 +55,12 @@ class TestUserService:
     def test_create_user_duplicate_email(self, db_session):
         """Test qu'on ne peut pas créer deux utilisateurs avec le même email."""
         data1 = UserCreate(
-            username="user1",
-            email="dupli@example.com",
-            password="pass123"
+            username="user1", email="dupli@example.com", password="pass123"
         )
         user_service.create_user(db_session, data1)
 
         data2 = UserCreate(
-            username="user2",
-            email="dupli@example.com",
-            password="pass123"
+            username="user2", email="dupli@example.com", password="pass123"
         )
         with pytest.raises(HTTPException) as exc_info:
             user_service.create_user(db_session, data2)
@@ -81,9 +71,7 @@ class TestUserService:
     def test_get_user_by_id_success(self, db_session):
         """Test la récupération d'un utilisateur sans erreur."""
         data = UserCreate(
-            username="alice",
-            email="alice@example.com",
-            password="pass123"
+            username="alice", email="alice@example.com", password="pass123"
         )
         created = user_service.create_user(db_session, data)
         retrieved = user_service.get_user(db_session, created.id)
@@ -102,9 +90,7 @@ class TestUserService:
         """Test que get_all_users retourne plusieurs utilisateurs."""
         for i in range(3):
             data = UserCreate(
-                username=f"user{i}",
-                email=f"user{i}@example.com",
-                password="pass123"
+                username=f"user{i}", email=f"user{i}@example.com", password="pass123"
             )
             user_service.create_user(db_session, data)
 
@@ -113,11 +99,7 @@ class TestUserService:
 
     def test_update_user_email_only(self, db_session):
         """Test la mise à jour partielle d'un utilisateur (email seul)."""
-        data = UserCreate(
-            username="bob",
-            email="bob@example.com",
-            password="pass123"
-        )
+        data = UserCreate(username="bob", email="bob@example.com", password="pass123")
         created = user_service.create_user(db_session, data)
 
         update_data = UserUpdate(email="bob.new@example.com")
@@ -129,17 +111,16 @@ class TestUserService:
     def test_update_user_password(self, db_session):
         """Test la mise à jour du mot de passe."""
         data = UserCreate(
-            username="charlie",
-            email="charlie@example.com",
-            password="oldpass123"
+            username="charlie", email="charlie@example.com", password="oldpass123"
         )
         created = user_service.create_user(db_session, data)
 
         update_data = UserUpdate(password="newpass456")
-        updated = user_service.update_user(db_session, created.id, update_data)
+        user_service.update_user(db_session, created.id, update_data)
 
         # Vérifier que le mot de passe peut être validé avec le nouveau
         from app.core.security import verify_password
+
         db_user = db_session.query(UserDB).filter(UserDB.id == created.id).first()
         assert verify_password("newpass456", db_user.hashed_password)
         assert not verify_password("oldpass123", db_user.hashed_password)
@@ -155,16 +136,12 @@ class TestUserService:
     def test_update_user_duplicate_email(self, db_session):
         """Test qu'on ne peut pas changer deux users vers le même email."""
         data1 = UserCreate(
-            username="user1",
-            email="email1@example.com",
-            password="pass123"
+            username="user1", email="email1@example.com", password="pass123"
         )
-        user1 = user_service.create_user(db_session, data1)
+        user_service.create_user(db_session, data1)
 
         data2 = UserCreate(
-            username="user2",
-            email="email2@example.com",
-            password="pass123"
+            username="user2", email="email2@example.com", password="pass123"
         )
         user2 = user_service.create_user(db_session, data2)
 
@@ -178,9 +155,7 @@ class TestUserService:
     def test_delete_user_success(self, db_session):
         """Test la suppression d'un utilisateur."""
         data = UserCreate(
-            username="deluser",
-            email="del@example.com",
-            password="pass123"
+            username="deluser", email="del@example.com", password="pass123"
         )
         created = user_service.create_user(db_session, data)
         result = user_service.delete_user(db_session, created.id)

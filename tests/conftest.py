@@ -19,9 +19,9 @@ from fastapi.testclient import TestClient
 # ce qui exige psycopg2 durant la phase de collecte pytest.
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
-from app.main import app
-from app.core.database import get_db
-from app.models.tables import Base
+from app.main import app  # noqa: E402
+from app.core.database import get_db  # noqa: E402
+from app.models.tables import Base  # noqa: E402
 
 
 @pytest.fixture(scope="session")

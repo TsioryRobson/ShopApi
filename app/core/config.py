@@ -12,7 +12,9 @@ class Settings(BaseSettings):
     """Configuration de l'application, lue depuis .env"""
 
     # Base de données — Postgres via Docker (docker-compose.yml)
-    DATABASE_URL: str = "postgresql://shopapi_user:shopapi_pass_dev@localhost:5433/shopapi_db"
+    DATABASE_URL: str = (
+        "postgresql://shopapi_user:shopapi_pass_dev@localhost:5433/shopapi_db"
+    )
 
     # JWT (pour US5 - Gaëlle)
     SECRET_KEY: str = "dev-secret-key-change-in-production"
@@ -27,7 +29,9 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        extra = "ignore"  # Ignore les variables .env supplémentaires (POSTGRES_USER, etc.)
+        extra = (
+            "ignore"  # Ignore les variables .env supplémentaires (POSTGRES_USER, etc.)
+        )
 
 
 # Instance unique — on l'importe partout avec : from app.core.config import settings
