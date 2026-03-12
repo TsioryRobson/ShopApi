@@ -14,7 +14,10 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock* /app/
 
 # Configurer poetry pour installer dans l'environnement global du container
+# poetry lock --no-update resynchronise le lock si pyproject.toml a change
+# sans modifier les versions deja resolues
 RUN poetry config virtualenvs.create false \
+    && poetry lock --no-update \
     && poetry install --no-interaction --no-ansi --no-root
 
 # Copier le reste du projet
