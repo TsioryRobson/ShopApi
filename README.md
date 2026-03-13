@@ -257,6 +257,15 @@ ShopApi/
 | `feature/US1-crud-categories` | CRUD Catégories |
 | `feature/Docker-config` | Configuration Docker |
 | `features/US2_crud_products` | CRUD Produits (Dania) |
+| `init/structure_project` | Structrue du projet (Dania) |
+| `feature/front-shopapi` | Interface ( Manoa ) |
+| `feature/us4_filtreproduitcategorie` | filtrage ( Daddy ) |
+| `feature/ci-cd` | Teste Ci-Cd ( El-Nadje ) |
+| `fix/get_product_by_id` | Interface ( Dania ) |
+| `feature/US-5-auth-api` | Authentification-api ( Tsiory ) |
+| `feature/add_mkDoks` | Documentation finale du projet ( Dania ) |
+| `feature/us3-crud-user` | CRUD user ( Manoa) |
+| `feature/majreadme` | Mise à jour du fichier Readme |
 
 ---
 
