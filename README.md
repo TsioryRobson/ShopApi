@@ -183,18 +183,29 @@ Database: shopapi_db
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ```bash
-# Lancer tous les tests
-poetry run pytest
+# 1) Verifier/installer les dependances de test (passlib inclus)
+make test-setup
 
-# Avec couverture de code
-poetry run pytest --cov=app
+# 2) Lancer tous les tests
+make test
 
-# Tests verbeux
-poetry run pytest -v
+# 3) Lancer rapidement (sortie concise)
+make test-fast
+
+# 4) Lancer avec coverage + rapport HTML
+make test-cov
+
+# 5) Lancer un fichier cible
+bash tests/run_tests.sh tests/test_auth.py -q
 ```
+
+Important:
+Ne pas lancer `pytest tests/conftest.py` directement.
+`conftest.py` est un fichier de fixtures charge automatiquement par pytest.
+Utiliser toujours `pytest tests` (ou `make test*`).
 
 ---
 
