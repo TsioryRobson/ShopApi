@@ -119,7 +119,7 @@ class TestUserService:
         user_service.update_user(db_session, created.id, update_data)
 
         # Vérifier que le mot de passe peut être validé avec le nouveau
-        from app.core.security import verify_password
+        from app.core.passwords import verify_password
 
         db_user = db_session.query(UserDB).filter(UserDB.id == created.id).first()
         assert verify_password("newpass456", db_user.hashed_password)

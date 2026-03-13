@@ -183,18 +183,29 @@ Database: shopapi_db
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ```bash
-# Lancer tous les tests
-poetry run pytest
+# 1) Verifier/installer les dependances de test (passlib inclus)
+make test-setup
 
-# Avec couverture de code
-poetry run pytest --cov=app
+# 2) Lancer tous les tests
+make test
 
-# Tests verbeux
-poetry run pytest -v
+# 3) Lancer rapidement (sortie concise)
+make test-fast
+
+# 4) Lancer avec coverage + rapport HTML
+make test-cov
+
+# 5) Lancer un fichier cible
+bash tests/run_tests.sh tests/test_auth.py -q
 ```
+
+Important:
+Ne pas lancer `pytest tests/conftest.py` directement.
+`conftest.py` est un fichier de fixtures charge automatiquement par pytest.
+Utiliser toujours `pytest tests` (ou `make test*`).
 
 ---
 
@@ -257,6 +268,15 @@ ShopApi/
 | `feature/US1-crud-categories` | CRUD Catégories |
 | `feature/Docker-config` | Configuration Docker |
 | `features/US2_crud_products` | CRUD Produits (Dania) |
+| `init/structure_project` | Structrue du projet (Dania) |
+| `feature/front-shopapi` | Interface ( Manoa ) |
+| `feature/us4_filtreproduitcategorie` | filtrage ( Daddy ) |
+| `feature/ci-cd` | Teste Ci-Cd ( El-Nadje ) |
+| `fix/get_product_by_id` | Interface ( Dania ) |
+| `feature/US-5-auth-api` | Authentification-api ( Tsiory ) |
+| `feature/add_mkDoks` | Documentation finale du projet ( Dania ) |
+| `feature/us3-crud-user` | CRUD user ( Manoa) |
+| `feature/majreadme` | Mise à jour du fichier Readme |
 
 ---
 

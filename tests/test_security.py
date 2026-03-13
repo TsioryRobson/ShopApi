@@ -6,7 +6,7 @@ Couvre :
 - verify_password() — vérification du mot de passe
 """
 
-from app.core.security import hash_password, verify_password
+from app.core.passwords import hash_password, verify_password
 
 
 class TestSecurityFunctions:
