@@ -21,7 +21,16 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 from app.main import app  # noqa: E402
 from app.core.database import get_db  # noqa: E402
+from app.core.security import get_current_user  # noqa: E402
 from app.models.tables import Base  # noqa: E402
+
+
+class _FakeUser:
+    """Utilisateur factice pour bypasser l'auth dans les tests."""
+    id = 1
+    username = "testadmin"
+    email = "admin@test.com"
+    is_active = True
 
 
 @pytest.fixture(scope="session")
@@ -54,6 +63,23 @@ def db_session(db_engine):
 @pytest.fixture(scope="function")
 def client(db_session):
     """Crée un TestClient FastAPI avec la session DB en test injectée."""
+
+    def override_get_db():
+        yield db_session
+
+    def override_get_current_user():
+        return _FakeUser()
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    client = TestClient(app)
+    yield client
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def plain_client(db_session):
+    """TestClient sans override de get_current_user — pour tester les flux auth réels."""
 
     def override_get_db():
         yield db_session

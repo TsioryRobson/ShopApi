@@ -6,7 +6,7 @@ import pytest
 from fastapi import HTTPException
 from app.models.user import UserCreate, UserUpdate
 from app.services import user_service
-from app.core.security import verify_password
+from app.core.passwords import verify_password
 from app.models.tables import UserDB
 
 

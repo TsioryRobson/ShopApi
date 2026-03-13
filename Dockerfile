@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Installer poetry
-RUN pip install --no-cache-dir poetry
+RUN pip install --no-cache-dir poetry six
 
 # Dossier de travail
 WORKDIR /app
@@ -26,5 +26,5 @@ COPY . /app
 # Port FastAPI
 EXPOSE 8000
 
-# Lancer l'application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Lancer l'application (--reload pour recharger automatiquement en dev)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

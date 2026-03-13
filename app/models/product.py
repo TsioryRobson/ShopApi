@@ -54,6 +54,10 @@ class ProductOut(ProductBase):
     """
     Schéma de SORTIE → ce que l'API renvoie au client.
     Inclut l'id généré automatiquement.
+    category_id est optionnel pour les cas où la catégorie a été supprimée.
     """
 
     id: int = Field(..., description="Identifiant unique du produit")
+    category_id: Optional[int] = Field(default=None, description="Identifiant de la catégorie")
+
+    model_config = {"from_attributes": True}

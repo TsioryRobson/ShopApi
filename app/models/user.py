@@ -71,3 +71,19 @@ class UserOut(BaseModel):
     email: str = Field(..., description="Adresse email")
 
     model_config = {"from_attributes": True}
+
+class Login(BaseModel):
+    """Payload attendu pour la connexion."""
+    email: str = Field(..., description="Email de l'utilisateur")
+    password: str = Field(..., description="Mot de passe en clair")
+
+
+class Token(BaseModel):
+    """Réponse retournée après authentification."""
+    access_token: str = Field(..., description="JWT d'accès")
+    token_type: str = Field(..., description="Type de token, ex: 'bearer'")
+
+
+class TokenData(BaseModel):
+    """Données extraites du token (ex: sub/email)."""
+    email: Optional[str] = None

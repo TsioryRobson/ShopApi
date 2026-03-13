@@ -14,11 +14,13 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import UserCreate, UserUpdate, UserOut
 from app.services import user_service
+from app.core.security import get_current_user
 
 router = APIRouter(
     prefix="/users",
     tags=["Users"],
     responses={404: {"description": "Utilisateur introuvable"}},
+    dependencies=[Depends(get_current_user)]  # Protéger tous les endpoints par auth
 )
 
 

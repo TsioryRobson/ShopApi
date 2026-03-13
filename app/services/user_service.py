@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.user import UserCreate, UserUpdate, UserOut
 from app.repositories import user_repo
-from app.core.security import hash_password
+from app.core.passwords import hash_password, verify_password
 
 
 def get_all_users(db: Session) -> list[UserOut]:
@@ -125,3 +125,22 @@ def delete_user(db: Session, user_id: int) -> dict:
             detail=f"Utilisateur avec l'id {user_id} introuvable",
         )
     return {"message": f"Utilisateur {user_id} supprimé avec succès"}
+
+
+def get_user_by_email(db: Session, email: str):
+    """Récupère un utilisateur par son email. Retourne None si introuvable."""
+    return user_repo.get_by_email(db, email)
+
+
+def authenticate_user(db: Session, email: str, password: str):
+    """
+    Vérifie les identifiants et retourne l'objet user DB si valides.
+
+    Retourne None si l'utilisateur n'existe pas ou si le mot de passe est incorrect.
+    """
+    user = user_repo.get_by_email(db, email)
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
