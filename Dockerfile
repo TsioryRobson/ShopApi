@@ -13,8 +13,11 @@ WORKDIR /app
 # Copier uniquement les fichiers de dépendances
 COPY pyproject.toml poetry.lock* /app/
 
-# Configurer poetry pour installer dans l'environnement global du container
+# Configurer poetry pour installer dans l'environnement global du container.
+# NOTE: `poetry lock --no-update` n'existe pas sur certaines versions de Poetry
+# (notamment Poetry 2.x). On utilise `poetry lock` simple.
 RUN poetry config virtualenvs.create false \
+    && poetry lock \
     && poetry install --no-interaction --no-ansi --no-root
 
 # Copier le reste du projet

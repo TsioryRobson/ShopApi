@@ -212,6 +212,18 @@ class TestProductService:
         result = ProductService.delete_product(db_session, 999)
         assert result is None
 
+    def test_get_product_by_id_success(self, db_session, category):
+        """Test la récupération d'un produit existant par ID."""
+        created = ProductService.create_product(
+            db_session,
+            ProductCreate(name="Monitor", price=120.0, category_id=category.id),
+        )
+
+        found = ProductService.get_product(db_session, created.id)
+        assert found is not None
+        assert found.id == created.id
+        assert found.name == "Monitor"
+
     # ------------------------------------------------------------------
     # Tests for new filter functionality
     # ------------------------------------------------------------------

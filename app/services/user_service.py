@@ -31,24 +31,49 @@ def get_user(db: Session, user_id: int) -> UserOut:
     return UserOut.model_validate(user)
 
 
-def create_user(db: Session, data: UserCreate) -> UserOut:
+def get_user_by_username(db: Session, username: str):
+    """Récupère un utilisateur par son username (retourne UserOut ou None)."""
+    user = user_repo.get_by_username(db, username)
+    return UserOut.model_validate(user) if user else None
+
+
+def get_user_by_email(db: Session, email: str):
+    """Récupère un utilisateur par son email (retourne UserOut ou None)."""
+    user = user_repo.get_by_email(db, email)
+    return UserOut.model_validate(user) if user else None
+
+
+def create_user(db: Session, data: UserCreate | dict) -> UserOut:
     """
     Crée un nouvel utilisateur.
+    Accepte soit un UserCreate, soit un dictionnaire {username, email, password}.
     Lève 409 si le username ou l'email est déjà utilisé.
     """
-    if user_repo.get_by_username(db, data.username) is not None:
+    # Normalize input
+    if isinstance(data, dict):
+        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
+        password = data.get("password", "")
+    else:
+        username = data.username
+        email = data.email
+        password = data.password
+
+    # Check for conflicts
+    if user_repo.get_by_username(db, username) is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Le username '{data.username}' est déjà utilisé",
+            detail=f"Le username '{username}' est déjà utilisé",
         )
-    if user_repo.get_by_email(db, data.email) is not None:
+    if user_repo.get_by_email(db, email) is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"L'email '{data.email}' est déjà utilisé",
+            detail=f"L'email '{email}' est déjà utilisé",
         )
 
-    hashed = hash_password(data.password)
-    user = user_repo.create(db, data.username, data.email, hashed)
+    # Hash password and create user
+    hashed = hash_password(password)
+    user = user_repo.create(db, username, email, hashed)
     return UserOut.model_validate(user)
 
 

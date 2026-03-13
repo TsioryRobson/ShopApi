@@ -269,6 +269,25 @@ class TestProductsRouter:
         # Pydantic rejette le prix négatif (gt=0)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    def test_get_product_by_id(self, client, category_id):
+        """GET /products/{id} — récupérer un produit par son ID."""
+        create_response = client.post(
+            "/products/",
+            json={"name": "Camera", "price": 299.99, "category_id": category_id},
+        )
+        product_id = create_response.json()["id"]
+
+        response = client.get(f"/products/{product_id}")
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == product_id
+        assert data["name"] == "Camera"
+
+    def test_get_product_not_found(self, client):
+        """GET /products/{id} — 404 si produit inexistant."""
+        response = client.get("/products/999")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
     def test_update_product(self, client, category_id):
         """PUT /products/{id} — mettre à jour un produit."""
         create_response = client.post(
