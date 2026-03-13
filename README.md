@@ -51,6 +51,9 @@ poetry run alembic upgrade head
 
 # 6. Lancer l'API
 poetry run uvicorn app.main:app --reload
+
+docker compose build --no-cache api
+docker compose up -d
 ```
 
 ### Accès
