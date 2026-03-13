@@ -6,6 +6,7 @@ import {
   deleteCategory,
   deleteProduct,
   deleteUser,
+  filterProducts,
   getApiBaseUrl,
   getHealth,
   listCategories,
@@ -41,6 +42,15 @@ function App() {
   const [editingCategoryId, setEditingCategoryId] = useState(null)
   const [editingProductId, setEditingProductId] = useState(null)
   const [editingUserId, setEditingUserId] = useState(null)
+
+  const [filterForm, setFilterForm] = useState({
+    name: '',
+    category_id: '',
+    min_price: '',
+    max_price: '',
+  })
+  const [filteredProducts, setFilteredProducts] = useState(null)
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const apiBaseUrl = getApiBaseUrl()
 
@@ -88,6 +98,34 @@ function App() {
     setEditingCategoryId(null)
     setEditingProductId(null)
     setEditingUserId(null)
+    setFilterForm({ name: '', category_id: '', min_price: '', max_price: '' })
+    setFilteredProducts(null)
+    setIsFiltering(false)
+  }
+
+  async function handleFilterSubmit(event) {
+    event.preventDefault()
+    setError('')
+    setIsFiltering(true)
+
+    try {
+      const results = await filterProducts({
+        name: filterForm.name.trim() || undefined,
+        category_id: filterForm.category_id || undefined,
+        min_price: filterForm.min_price !== '' ? Number(filterForm.min_price) : undefined,
+        max_price: filterForm.max_price !== '' ? Number(filterForm.max_price) : undefined,
+      })
+      setFilteredProducts(results)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setIsFiltering(false)
+    }
+  }
+
+  function resetFilter() {
+    setFilterForm({ name: '', category_id: '', min_price: '', max_price: '' })
+    setFilteredProducts(null)
   }
 
   async function handleCategorySubmit(event) {
@@ -374,6 +412,7 @@ function App() {
 
         <article className="card">
           <h2>{editingProductId ? 'Modifier produit' : 'Nouveau produit'}</h2>
+
           <form className="stack" onSubmit={handleProductSubmit}>
             <label>
               Nom
@@ -435,6 +474,63 @@ function App() {
             </button>
           </form>
 
+          <details className="filter-panel">
+            <summary>Filtrer les produits {filteredProducts !== null ? <span className="filter-badge">{filteredProducts.length} resultat{filteredProducts.length !== 1 ? 's' : ''}</span> : null}</summary>
+            <form className="stack filter-grid" onSubmit={handleFilterSubmit}>
+              <label>
+                Nom
+                <input
+                  type="text"
+                  value={filterForm.name}
+                  onChange={(e) => setFilterForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="ex: iPhone"
+                />
+              </label>
+              <label>
+                Categorie
+                <select
+                  value={filterForm.category_id}
+                  onChange={(e) => setFilterForm((p) => ({ ...p, category_id: e.target.value }))}
+                >
+                  <option value="">Toutes</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Prix min
+                <input
+                  type="number"
+                  value={filterForm.min_price}
+                  onChange={(e) => setFilterForm((p) => ({ ...p, min_price: e.target.value }))}
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </label>
+              <label>
+                Prix max
+                <input
+                  type="number"
+                  value={filterForm.max_price}
+                  onChange={(e) => setFilterForm((p) => ({ ...p, max_price: e.target.value }))}
+                  min="0"
+                  step="0.01"
+                  placeholder="999.99"
+                />
+              </label>
+              <div className="filter-actions">
+                <button type="submit" disabled={isFiltering}>
+                  {isFiltering ? 'Recherche...' : 'Filtrer'}
+                </button>
+                <button type="button" className="ghost" onClick={resetFilter}>
+                  Reinitialiser
+                </button>
+              </div>
+            </form>
+          </details>
+
           <div className="table-wrapper">
             <table>
               <thead>
@@ -447,7 +543,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
+                {(filteredProducts ?? products).map((product) => (
                   <tr key={product.id}>
                     <td>{product.id}</td>
                     <td>{product.name}</td>
