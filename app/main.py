@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.core.config import settings
-from app.routers import categories, products, users
+from app.routers import auth, categories, products, users
 
 
 @asynccontextmanager
@@ -51,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(products.router)
 app.include_router(users.router)
