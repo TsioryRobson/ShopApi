@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LogOut, MoonStar, SunMedium, UserRound } from 'lucide-react'
 import { logout, clearAuth } from '../api'
 
 export default function Navbar({ user, onLogout, isDark, onToggleDarkMode }) {
@@ -21,8 +22,8 @@ export default function Navbar({ user, onLogout, isDark, onToggleDarkMode }) {
     <nav className="navbar">
       <div className="navbar-content">
         <div className="navbar-brand">
-          <h1>🛍️ ShopAPI</h1>
-          <p>Gestion de produits</p>
+          <h1>ShopAPI</h1>
+          <p>E-commerce cockpit</p>
         </div>
 
         <div className="navbar-right">
@@ -31,18 +32,19 @@ export default function Navbar({ user, onLogout, isDark, onToggleDarkMode }) {
             onClick={onToggleDarkMode}
             title={isDark ? 'Mode clair' : 'Mode sombre'}
           >
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? <SunMedium size={16} /> : <MoonStar size={16} />}
           </button>
 
           {user && (
             <div className="user-info">
-              <span className="user-name">👤 {user.username}</span>
+              <span className="user-name"><UserRound size={14} /> {user.username}</span>
               <button 
                 className="btn btn-logout"
                 onClick={handleLogout}
                 disabled={loading}
               >
-                {loading ? 'Déconnexion...' : 'Déconnexion'}
+                <LogOut size={14} />
+                {loading ? 'Deconnexion...' : 'Deconnexion'}
               </button>
             </div>
           )}

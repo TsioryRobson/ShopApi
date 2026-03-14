@@ -165,3 +165,8 @@ export function deleteUser(userId) {
     method: 'DELETE',
   })
 }
+
+// Health check
+export function getHealth() {
+  return request('/')
+}

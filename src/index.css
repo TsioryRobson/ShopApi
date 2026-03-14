@@ -1,39 +1,18 @@
-:root {
-  --bg-main: #f7f4eb;
-  --bg-soft: #fbfaf6;
-  --text: #1f312b;
-  --text-soft: #3a5148;
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
 
-  font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, sans-serif;
+:root {
+  font-family: 'Manrope', 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: var(--text);
-  background-color: var(--bg-main);
+  font-weight: 500;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  color: var(--text);
-  background:
-    radial-gradient(circle at 5% 8%, #e6f1ea 0%, transparent 40%),
-    radial-gradient(circle at 92% 6%, #f8e5be 0%, transparent 32%),
-    linear-gradient(180deg, var(--bg-soft), var(--bg-main));
-}
-
-code {
-  font-family: 'Cascadia Mono', 'Fira Code', 'Consolas', monospace;
-  background: #ffffffaa;
-  border: 1px solid #d9e2dd;
-  border-radius: 6px;
-  padding: 0.1rem 0.3rem;
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Plus Jakarta Sans', 'Manrope', 'Segoe UI', sans-serif;
 }

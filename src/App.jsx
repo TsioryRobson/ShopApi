@@ -1,5 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  Boxes,
+  CircleAlert,
+  FolderKanban,
+  Layers,
+  RefreshCw,
+  Search,
+  SlidersHorizontal,
+  Users,
+} from 'lucide-react'
+import { toast } from 'react-hot-toast'
+import {
+  clearAuth,
   createCategory,
   createProduct,
   createUser,
@@ -9,6 +21,7 @@ import {
   filterProducts,
   getApiBaseUrl,
   getHealth,
+  getToken,
   listCategories,
   listProducts,
   listUsers,
@@ -16,6 +29,9 @@ import {
   updateProduct,
   updateUser,
 } from './api'
+import Login from './components/Login'
+import Register from './components/Register'
+import Navbar from './components/Navbar'
 import './App.css'
 
 function App() {
@@ -52,6 +68,11 @@ function App() {
   const [filteredProducts, setFilteredProducts] = useState(null)
   const [isFiltering, setIsFiltering] = useState(false)
 
+  const [currentUser, setCurrentUser] = useState(null)
+  const [authView, setAuthView] = useState('login')
+  const [authChecked, setAuthChecked] = useState(false)
+  const [isDark, setIsDark] = useState(false)
+
   const apiBaseUrl = getApiBaseUrl()
 
   const categoryNameById = useMemo(() => {
@@ -61,6 +82,15 @@ function App() {
     })
     return map
   }, [categories])
+
+  const stats = useMemo(
+    () => [
+      { label: 'Categories', value: categories.length, icon: FolderKanban },
+      { label: 'Produits', value: products.length, icon: Boxes },
+      { label: 'Utilisateurs', value: users.length, icon: Users },
+    ],
+    [categories.length, products.length, users.length],
+  )
 
   const refreshData = useCallback(async () => {
     setLoading(true)
@@ -82,14 +112,61 @@ function App() {
     } catch (requestError) {
       setHealth('API indisponible')
       setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setLoading(false)
     }
   }, [])
 
+  // Restauration de session depuis localStorage au montage
   useEffect(() => {
-    refreshData()
-  }, [refreshData])
+    const token = getToken()
+    const storedUser = localStorage.getItem('user')
+    if (token && storedUser) {
+      try {
+        setCurrentUser(JSON.parse(storedUser))
+      } catch {
+        clearAuth()
+      }
+    }
+    setAuthChecked(true)
+  }, [])
+
+  useEffect(() => {
+    if (currentUser) {
+      refreshData()
+    }
+  }, [currentUser, refreshData])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
+
+  function handleAuthSuccess() {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        setCurrentUser(JSON.parse(storedUser))
+      } catch {
+        clearAuth()
+      }
+    }
+  }
+
+  function handleLogout() {
+    setCurrentUser(null)
+    setCategories([])
+    setProducts([])
+    setUsers([])
+    setHealth('Chargement...')
+    setError('')
+    setAuthView('login')
+    toast.success('Session fermee')
+  }
+
+  function toggleDarkMode() {
+    setIsDark((prev) => !prev)
+  }
 
   function resetForms() {
     setCategoryForm({ name: '', description: '' })
@@ -118,6 +195,7 @@ function App() {
       setFilteredProducts(results)
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setIsFiltering(false)
     }
@@ -153,8 +231,10 @@ function App() {
       setCategoryForm({ name: '', description: '' })
       setEditingCategoryId(null)
       await refreshData()
+      toast.success(editingCategoryId ? 'Categorie mise a jour' : 'Categorie creee')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -196,8 +276,10 @@ function App() {
       setProductForm({ name: '', price: '', category_id: '' })
       setEditingProductId(null)
       await refreshData()
+      toast.success(editingProductId ? 'Produit mis a jour' : 'Produit cree')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -243,8 +325,10 @@ function App() {
       setUserForm({ username: '', email: '', password: '' })
       setEditingUserId(null)
       await refreshData()
+      toast.success(editingUserId ? 'Utilisateur mis a jour' : 'Utilisateur cree')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -282,8 +366,10 @@ function App() {
     try {
       await deleteCategory(categoryId)
       await refreshData()
+      toast.success('Categorie supprimee')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -295,8 +381,10 @@ function App() {
     try {
       await deleteProduct(productId)
       await refreshData()
+      toast.success('Produit supprime')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -308,37 +396,99 @@ function App() {
     try {
       await deleteUser(userId)
       await refreshData()
+      toast.success('Utilisateur supprime')
     } catch (requestError) {
       setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
-  return (
-    <main className="page-shell">
-      <header className="hero">
-        <p className="eyebrow">Front-office Shop API</p>
-        <h1>Gestion complete du backend ShopApi</h1>
-        <p>
-          API cible: <code>{apiBaseUrl}</code>
-        </p>
-        <div className="hero-status">
-          <span className="status-dot" />
-          <strong>Etat:</strong> {loading ? 'Synchronisation...' : health}
-        </div>
-        <div className="hero-actions">
-          <button type="button" onClick={refreshData}>
-            Rafraichir
-          </button>
-          <button type="button" className="ghost" onClick={resetForms}>
-            Reinitialiser formulaires
-          </button>
-        </div>
-        {error ? <p className="error-banner">Erreur: {error}</p> : null}
-      </header>
+  if (!authChecked) {
+    return <div className="auth-loading">Chargement...</div>
+  }
 
-      <section className="grid-layout">
-        <article className="card">
-          <h2>{editingCategoryId ? 'Modifier categorie' : 'Nouvelle categorie'}</h2>
+  if (!currentUser) {
+    if (authView === 'register') {
+      return (
+        <Register
+          onRegisterSuccess={handleAuthSuccess}
+          onSwitchToLogin={() => setAuthView('login')}
+        />
+      )
+    }
+    return (
+      <Login
+        onLoginSuccess={handleAuthSuccess}
+        onSwitchToRegister={() => setAuthView('register')}
+      />
+    )
+  }
+
+  return (
+    <>
+      <Navbar
+        user={currentUser}
+        onLogout={handleLogout}
+        isDark={isDark}
+        onToggleDarkMode={toggleDarkMode}
+      />
+      <main className="page-shell">
+        <header className="hero">
+          <div className="hero-main">
+            <div>
+              <p className="eyebrow">E-commerce Control Center</p>
+              <h1>Gestion premium de votre Shop API</h1>
+              <p className="hero-subtitle">
+                API cible: <code>{apiBaseUrl}</code>
+              </p>
+              <div className="hero-status">
+                <span className="status-dot" />
+                <strong>Etat:</strong> {loading ? 'Synchronisation...' : health}
+              </div>
+            </div>
+            <div className="hero-actions">
+              <button type="button" className="btn-modern" onClick={refreshData}>
+                <RefreshCw size={16} />
+                Rafraichir
+              </button>
+              <button type="button" className="btn-glass" onClick={resetForms}>
+                <Layers size={16} />
+                Reinitialiser
+              </button>
+            </div>
+          </div>
+
+          <div className="stats-grid">
+            {stats.map((item) => {
+              const Icon = item.icon
+              return (
+                <article key={item.label} className="metric-card">
+                  <span className="metric-icon">
+                    <Icon size={17} />
+                  </span>
+                  <div>
+                    <p>{item.label}</p>
+                    <strong>{item.value}</strong>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+
+          {error ? (
+            <p className="error-banner">
+              <CircleAlert size={16} />
+              Erreur: {error}
+            </p>
+          ) : null}
+        </header>
+
+        <section className="grid-layout">
+          <article className="card glass-card">
+            <div className="section-title">
+              <FolderKanban size={17} />
+              <h2>{editingCategoryId ? 'Modifier categorie' : 'Nouvelle categorie'}</h2>
+            </div>
           <form className="stack" onSubmit={handleCategorySubmit}>
             <label>
               Nom
@@ -370,13 +520,13 @@ function App() {
                 rows={3}
               />
             </label>
-            <button type="submit">
+            <button type="submit" className="btn-modern">
               {editingCategoryId ? 'Sauvegarder categorie' : 'Creer categorie'}
             </button>
           </form>
 
-          <div className="table-wrapper">
-            <table>
+            <div className="table-wrapper">
+              <table className="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -392,12 +542,12 @@ function App() {
                     <td>{category.name}</td>
                     <td>{category.description || '-'}</td>
                     <td className="table-actions">
-                      <button type="button" onClick={() => startEditCategory(category)}>
+                      <button type="button" className="btn-ghost" onClick={() => startEditCategory(category)}>
                         Editer
                       </button>
                       <button
                         type="button"
-                        className="danger"
+                        className="btn-danger"
                         onClick={() => handleDeleteCategory(category.id)}
                       >
                         Supprimer
@@ -407,11 +557,14 @@ function App() {
                 ))}
               </tbody>
             </table>
-          </div>
-        </article>
+            </div>
+          </article>
 
-        <article className="card">
-          <h2>{editingProductId ? 'Modifier produit' : 'Nouveau produit'}</h2>
+          <article className="card glass-card">
+            <div className="section-title">
+              <Boxes size={17} />
+              <h2>{editingProductId ? 'Modifier produit' : 'Nouveau produit'}</h2>
+            </div>
 
           <form className="stack" onSubmit={handleProductSubmit}>
             <label>
@@ -469,13 +622,22 @@ function App() {
               </select>
             </label>
 
-            <button type="submit">
+            <button type="submit" className="btn-modern">
               {editingProductId ? 'Sauvegarder produit' : 'Creer produit'}
             </button>
           </form>
 
           <details className="filter-panel">
-            <summary>Filtrer les produits {filteredProducts !== null ? <span className="filter-badge">{filteredProducts.length} resultat{filteredProducts.length !== 1 ? 's' : ''}</span> : null}</summary>
+            <summary>
+              <span className="filter-summary-title">
+                <SlidersHorizontal size={15} /> Filtrer les produits
+              </span>
+              {filteredProducts !== null ? (
+                <span className="filter-badge">
+                  <Search size={12} /> {filteredProducts.length} resultat{filteredProducts.length !== 1 ? 's' : ''}
+                </span>
+              ) : null}
+            </summary>
             <form className="stack filter-grid" onSubmit={handleFilterSubmit}>
               <label>
                 Nom
@@ -521,10 +683,10 @@ function App() {
                 />
               </label>
               <div className="filter-actions">
-                <button type="submit" disabled={isFiltering}>
+                <button type="submit" className="btn-modern" disabled={isFiltering}>
                   {isFiltering ? 'Recherche...' : 'Filtrer'}
                 </button>
-                <button type="button" className="ghost" onClick={resetFilter}>
+                <button type="button" className="btn-glass" onClick={resetFilter}>
                   Reinitialiser
                 </button>
               </div>
@@ -532,7 +694,7 @@ function App() {
           </details>
 
           <div className="table-wrapper">
-            <table>
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -550,12 +712,12 @@ function App() {
                     <td>{Number(product.price).toFixed(2)} EUR</td>
                     <td>{categoryNameById.get(product.category_id) || 'N/A'}</td>
                     <td className="table-actions">
-                      <button type="button" onClick={() => startEditProduct(product)}>
+                      <button type="button" className="btn-ghost" onClick={() => startEditProduct(product)}>
                         Editer
                       </button>
                       <button
                         type="button"
-                        className="danger"
+                        className="btn-danger"
                         onClick={() => handleDeleteProduct(product.id)}
                       >
                         Supprimer
@@ -566,10 +728,13 @@ function App() {
               </tbody>
             </table>
           </div>
-        </article>
+          </article>
 
-        <article className="card full-width">
-          <h2>{editingUserId ? 'Modifier utilisateur' : 'Nouvel utilisateur'}</h2>
+          <article className="card glass-card full-width">
+            <div className="section-title">
+              <Users size={17} />
+              <h2>{editingUserId ? 'Modifier utilisateur' : 'Nouvel utilisateur'}</h2>
+            </div>
           <form className="stack three-columns" onSubmit={handleUserSubmit}>
             <label>
               Username
@@ -617,13 +782,13 @@ function App() {
                 required={!editingUserId}
               />
             </label>
-            <button type="submit">
+            <button type="submit" className="btn-modern">
               {editingUserId ? 'Sauvegarder utilisateur' : 'Creer utilisateur'}
             </button>
           </form>
 
           <div className="table-wrapper">
-            <table>
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -639,12 +804,12 @@ function App() {
                     <td>{user.username}</td>
                     <td>{user.email}</td>
                     <td className="table-actions">
-                      <button type="button" onClick={() => startEditUser(user)}>
+                      <button type="button" className="btn-ghost" onClick={() => startEditUser(user)}>
                         Editer
                       </button>
                       <button
                         type="button"
-                        className="danger"
+                        className="btn-danger"
                         onClick={() => handleDeleteUser(user.id)}
                       >
                         Supprimer
@@ -655,9 +820,10 @@ function App() {
               </tbody>
             </table>
           </div>
-        </article>
-      </section>
-    </main>
+          </article>
+        </section>
+      </main>
+    </>
   )
 }
 
